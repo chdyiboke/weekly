@@ -1,7 +1,7 @@
 # weekly
 issue and share weekly
 
-## 每周一次讨论 issue
+## 讨论 issue
 
 写到 issue 里面，一直open就好，各抒己见。  
 
@@ -31,9 +31,26 @@ function new(func) {
 
 // 结果是Object和Function类型的可以返回，这里要排除null，因为它也是’object'
 
-## 每周一次 share
+## 乐于分享 share
 
 
 pr 到master
 
+最好是前沿知识，当然，任何想分享的都很棒。
+
+例子：
+
+```
+新一代打包
+
+vite 与 snowpack
+
+
+我们完全可以抛弃打包工具，而直接在浏览器中使用浏览器原生的 JavaScript 模块功能。这主要基于三点考虑：
+1. 兼容性可接受：基本主流的浏览器版本都支持直接使用 JavaScript Module 了（当然，IE 一如既往除外）。
+2. 性能问题的改善：之前打包的一个重要原因是 HTTP/1.1 的特性导致，我们合并请求来优化性能；而如今 HTTP/2 普及之后，这个性能问题不像以前那么突出了。
+
+`webpack`要亡了吗？
+
+```
 

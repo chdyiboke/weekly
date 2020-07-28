@@ -31,7 +31,7 @@ const Label = styled.span`
 <Label>猫眼id:</Label>
 <Label>综艺名字:</Label>
 ```
-这个例子创建了一个名为Label的可复用组件，但希望在使用的同时，希望避免过度组件化，毕竟代码的可读性教差。
+这个例子创建了一个名为Label的可复用组件，但希望在使用的同时，希望避免过度组件化，毕竟代码的可读性较差。
 
 ## CSS-Modules
 

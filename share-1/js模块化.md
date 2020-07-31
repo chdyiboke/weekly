@@ -37,6 +37,7 @@ https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Modules
 
 ## 新一代打包
 
+### vite 与 snowpack
 
 我们完全可以抛弃打包工具，而直接在浏览器中使用浏览器原生的 JavaScript 模块功能。这主要基于三点考虑：
 1. 兼容性可接受：基本主流的浏览器版本都支持直接使用 JavaScript Module 了（当然，IE 一如既往除外）。

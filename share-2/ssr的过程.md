@@ -8,12 +8,13 @@
 ## csr vs  ssr
 csr: 客户端渲染渲染，当请求user页面时，返回的body里为空，之后执行js将html结构注入到body里，结合css显示出来；
 
-服务端渲染，当请求user页面时，返回的body里已经有了首屏的html结构，之后结合css显示出来
+
+ssr: 服务端渲染，当请求user页面时，返回的body里已经有了首屏的html结构，之后结合css显示出来
 
 对比 ads 和 keeper
 
 
-## 打包的过程
+## csr 和 ssr 渲染过程
 
 服务端渲染是先向后端服务器请求数据，然后生成完整首屏html返回给浏览器；而客户端渲染是等js代码下载、加载、解析完成后再请求数据渲染，等待的过程页面是什么都没有的，就是用户看到的白屏。就是服务端渲染不需要等待js代码下载完成并请求数据，就可以返回一个已有完整数据的首屏页面。
 
@@ -55,5 +56,5 @@ csr: 客户端渲染渲染，当请求user页面时，返回的body里为空，�
 
 ## QA
 
-HTML Parser ： HTML解析器
-CSS Parser： CSS 解析器
+HTML Parser ： HTML解析器  
+CSS Parser： CSS 解析器  

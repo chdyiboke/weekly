@@ -55,6 +55,10 @@ ssr: 服务端渲染，当请求user页面时，返回的body里已经有了首�
 
 
 ## QA
-
+1. Parser
 HTML Parser ： HTML解析器  
 CSS Parser： CSS 解析器  
+
+2. 占位符
+
+react在node打包后插入占位符。

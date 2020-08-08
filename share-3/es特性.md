@@ -174,9 +174,12 @@ console.log(typeof bigIntNum1)//bigint
 
 ### 动态导入
 ```js
-// 需要在http服务器环境下，才可以, 否则报错
 export const sum=(num1,num2)=>num1+num2;
-let fun=async(num1,num2)=>{  let model=await import('./demo.js');  console.log(model.sum(num1,num2),"两个数的和")}fun(8,9)//17 "两个数的和"
+let fun=async(num1,num2)=>{  
+    let model=await import('./demo.js');  
+    console.log(model.sum(num1,num2),"两个数的和")
+}
+fun(8,9)//17 "两个数的和"
 ```
 ### globalThis
 

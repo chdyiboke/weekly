@@ -69,3 +69,51 @@ https://static-tweet.now.sh/1293522955863982081
 
 https://static-tweet.now.sh/1293523004912148481
 
+
+
+## getStaticProps
+
+
+使用场景“
+1. 呈现页面所需的数据可在构建时在用户请求之前获得。
+2. 数据来自无头CMS
+3. 数据可以被公共缓存（不是特定于用户的）
+4. 该页面必须预渲染（对于SEO）并且必须非常快- getStaticProps生成HTML和JSON文件，CDN可以将它们都缓存以提高性能。
+
+
+https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation
+
+
+```
+// posts will be populated at build time by getStaticProps()
+function Blog({ posts }) {
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+
+// This function gets called at build time on server-side.
+// It won't be called on client-side, so you can even do
+// direct database queries. See the "Technical details" section.
+export async function getStaticProps() {
+  // Call an external API endpoint to get posts.
+  // You can use any data fetching library
+  const res = await fetch('https://.../posts')
+  const posts = await res.json()
+
+  // By returning { props: posts }, the Blog component
+  // will receive `posts` as a prop at build time
+  return {
+    props: {
+      posts,
+    },
+  }
+}
+
+export default Blog
+
+```

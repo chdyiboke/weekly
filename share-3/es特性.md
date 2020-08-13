@@ -125,6 +125,14 @@ for (const match of allMatchs) {
 }
 ```
 * 现在返回精确字符，包括空格和注释
+```js
+function a() {/* a */}
+a.toString()    // "function a() {/* a */}"
+var b = /* a */ () => { }
+b.toString()    // "() => { }"
+var c = () /* a */ => { }
+c.toString()    //  "() /* a */ => { }"
+```
 
 ## es11（2020）
 

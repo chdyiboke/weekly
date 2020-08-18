@@ -93,19 +93,76 @@ Fiber reconciler 使用了scheduling(调度)这一过程， 每次只做一个�
 
 https://juejin.im/post/6859528127010471949
 
-work： state update，props update 或 refs update  
-
-Fiber 对象：packages/react-reconciler/src/ReactFiber.js 
-
-workTag： fiber 对象的 tag 属性值，称作 workTag，用于标识一个 React 元素的类型  
-EffectTag： 把不能在 render 阶段完成的一些 work 称之为副作用  
-
-在 render 阶段，React 可以根据当前可用的时间片处理一个或多个 fiber 节点，并且得益于 fiber 对象中存储的元素上下文信息以及指针域构成的链表结构，使其能够将执行到一半的工作保存在内存的链表中。当 React 停止并完成保存的工作后，让出时间片去处理一些其他优先级更高的事情。之后，在重新获取到可用的时间片后，它能够根据之前保存在内存的上下文信息通过快速遍历的方式找到停止的 fiber 节点并继续工作。由于在此阶段执行的工作并不会导致任何用户可见的更改，因为并没有被提交到真实的 DOM。所以，我们说是 fiber 让调度能够实现暂停、中止以及重新开始等增量渲染的能力。相反，在 commit 阶段，work 执行总是同步的，这是因为在此阶段执行的工作将导致用户可见的更改。这就是为什么在 commit 阶段， React 需要一次性提交并完成这些工作的原因。
-
 
 当 React 遍历 current 树时，它会为每一个存在的 fiber 节点创建了一个替代节点，这些节点构成一个 workInProgress 树。后续所有发生 work 的地方都是在 workInProgress 树中执行。
 
 
+### 深度优先 算法
+
+```
+function walk(o) {
+    let root = o;
+    let current = o;
+
+    while (true) {
+        // 为节点执行工作，获取并连接它的children
+        let child = doWork(current); // 打印节点名称
+
+        // 如果child不为空, 将它设置为当前活跃节点
+        if (child) {
+            current = child;
+            continue;
+        }
+
+        // 如果我们回到了根节点，退出函数
+        if (current === root) {
+            return;
+        }
+
+        // 遍历直到我们发现兄弟节点
+        while (!current.sibling) {
+
+            // 如果我们回到了根节点，退出函数
+            if (!current.return || current.return === root) {
+                return;
+            }
+
+            // 设置父节点为当前活跃节点
+            current = current.return;
+        }
+
+        // 如果发现兄弟节点，设置兄弟节点为当前活跃节点
+        current = current.sibling;
+    }
+}
+
+```
+
+思路是保持对当前节点的引用，并在向下遍历树时重新给它赋值，直到我们到达分支的末尾。然后我们使用return指针返回根节点。
+
+   Fiber是堆栈的重新实现，专门用于React组件。你可以将单个Fiber视为一个虚拟堆栈帧。
+
+
+这正是我们想要实现的能够使用新的requestIdleCallback API，可以随时停止遍历并稍后恢复。
+
+```
+function workLoop(isYieldy) {
+    // 调度员是否要求让步
+    if (!isYieldy) {
+        while (nextUnitOfWork !== null) {
+            nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+        }
+    } else {
+        // 刷新异步工作，直到截止时间用完 应该让步的操作
+        while (nextUnitOfWork !== null && !shouldYield()) {
+            nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+        }
+    }
+}
+
+```
+
+### 附：
 enqueueSetState
 每个 React 组件都有一个相关联的 updater，作为组件层和核心库之间的桥梁。react.Component 本质上就是一个函数，在它的原型对象上挂载了 setState 方法
 
@@ -121,8 +178,14 @@ enqueueSetState
 
 
 ## QA
-setstate是同步的嘛？
-看是否能命中 batchUpdate 。setTimeout等定时器不能命中，所以是同步等。
+setstate是异步的嘛？
+看是否能命中 batchUpdate（批量更新） 。setTimeout等定时器不能命中，所以是同步等。
+
+未来 React 希望做到不管里你在哪里写 setState，一个 tick 内的多次 setState 都给你合并掉。
+
+
+
+
 
 
 

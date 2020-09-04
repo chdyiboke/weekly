@@ -122,6 +122,7 @@ export const Classmates = () => {
 };
 ```
 
+![这是图片](https://res.cloudinary.com/practicaldev/image/fetch/s--AOm0wXor--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_66%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/i/i92v6bon13c90fyzzqyd.gif)
 
 good
 
@@ -212,7 +213,7 @@ key值的唯一是有范围的，即在数组生成的同级同类型的组件�
 
 ```
 
-　　React在比较第一个li就发现了差异(<li>Duke</li>与<li>Connecticut</li>)，如果React将第一个li中的内容进行更新，那么你会发现第二个li(<li>Villanova</li>与<li>Duke</li>)也需要将li中内容进行更新，并且第三个<li>需要安装新的元素，但事实真的是如此吗？其实不然，我们发现新的元素树和旧的元素树，只有第一项是不同的，后两项其实并没有发生改变，如果React懂得在旧的元素树开始出插入<li>Connecticut</li>，那么性能会极大的提高，关键问题是React如何进行这种判别，这时React就用到了key属性。
+　　React在比较第一个li就发现了差异，如果React将第一个li中的内容进行更新，那么你会发现第二个li不同 也需要将li中内容进行更新，并且第三个<li>需要安装新的元素，但事实真的是如此吗？其实不然，我们发现新的元素树和旧的元素树，只有第一项是不同的，后两项其实并没有发生改变，如果React懂得在旧的元素树开始出插入li，那么性能会极大的提高，关键问题是React如何进行这种判别，这时React就用到了key属性。
 
 
 

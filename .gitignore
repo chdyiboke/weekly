@@ -1,0 +1,11 @@
+.DS_Store
+.vscode
+
+bin/.last_run_module
+node_modules/
+
+public
+
+version.json
+.idea
+yarn-error.log

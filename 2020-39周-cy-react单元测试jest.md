@@ -102,7 +102,7 @@ module.exports = {
     'src/components/**/*.{js}',
   ],
   moduleNameMapper: {
-    "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+    "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4)$": "<rootDir>/__mocks__/fileMock.js",
     "\\.(css|less|scss)$": "<rootDir>/__mocks__/styleMock.js"
   },
   transform: {
@@ -199,7 +199,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 ```
 
-通过下面的 demo 来看应用，文档写的很赞
+通过下面的 demo 来看应用，[这篇文档写的很赞](https://www.valentinog.com/blog/testing-react/)
 
 ### react create app
 
@@ -222,8 +222,8 @@ import { act } from "react-dom/test-utils";
   });
 ```
 
-只是断言其内部状态，用户看到的不一定是测试那样。
-https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderergetinstance
+只是断言其内部状态，用户看到的不一定是测试那样。[api文档](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderergetinstance)
+
 
 #### 正确的方式，测试 React 组件
 
@@ -239,7 +239,7 @@ https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderergetinstance
   });
 ```
 
-永远记住：不要测试实现。
+永远记住：`不要测试实现`。
 
 #### React 钩子插曲：Act API
 
@@ -325,7 +325,7 @@ beforeEach(() => {
 
 ### Enzyme
 
-官方测试工具库的封装，它模拟了jQuery的API，非常直观，易于使用和学习。
+官方测试工具库的封装，它模拟了 jQuery 的API，非常直观，易于使用和学习。
 它提供三种测试方法。
 
 * shallow：虚拟 DOM
@@ -380,8 +380,8 @@ describe('Enzyme Render', function () {
 ```
 ## 参考
 
-《Testing React Components: The Mostly Definitive Guide》 ：https://www.valentinog.com/blog/testing-react/
-阮一峰 react 测试入门教程： http://www.ruanyifeng.com/blog/2016/02/react-testing-tutorial.html
-Next.js 项目单元测试的配置（Jest+Enzyme）: https://juejin.im/post/6844904111184281608
-react 官网测试指南：https://reactjs.org/docs/test-utils.html
-Jest 进行 React 单元测试详情: https://juejin.im/post/6844903654294716423
+* 《Testing React Components: The Mostly Definitive Guide》 ：https://www.valentinog.com/blog/testing-react/
+* 阮一峰 react 测试入门教程： http://www.ruanyifeng.com/blog/2016/02/react-testing-tutorial.html
+* Next.js 项目单元测试的配置（Jest+Enzyme）: https://juejin.im/post/6844904111184281608
+* react 官网测试指南：https://reactjs.org/docs/test-utils.html
+* Jest 进行 React 单元测试详情: https://juejin.im/post/6844903654294716423

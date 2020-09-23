@@ -24,9 +24,9 @@ window.requestIdleCallback()
 
 ### 比较
 
-![avatar](../img/fiber.png)
+![avatar](/img/fiber.png)
 
-![avatar](../img/stack.png)
+![avatar](/img/stack.png)
 
 中间每一个波谷代表深入某个分片的执行过程，每个波峰就是一个分片执行结束交还控制权的时机。
 
@@ -72,7 +72,7 @@ React 框架内部运作可以分为 3 层：
 阶段一有两颗树，Virtual DOM 树和 Fiber 树，Fiber 树是在 Virtual DOM 树的基础上通过额外信息生成的。
 它每生成一个新节点，就会将控制权还给浏览器，如果浏览器没有更高级别的任务要执行，则继续构建；反之则会丢弃 正在生成的 Fiber 树，等空闲的时候再重新执行一遍。
 
-![avatar](../img/优先级.png)
+![avatar](/img/优先级.png)
 
 比如：一个低优先级的任务A正在执行，已经调用了某个组件的componentWillUpdate函数，接下来发现自己的时间分片已经用完了，于是冒出水面，看看有没有紧急任务，哎呀，真的有一个紧急任务B，接下来React Fiber就会去执行这个紧急任务B，任务A虽然进行了一半，但是没办法，只能完全放弃，等到任务B全搞定之后，任务A重头来一遍，注意，是重头来一遍，不是从刚才中段的部分开始，也就是说，componentWillUpdate函数会被再调用一次。
 
@@ -106,13 +106,13 @@ React 在 render 第一次渲染时，会通过 React.createElement 创建一颗
 
 Fiber Tree 一个重要的特点是链表结构，将递归遍历编程循环遍历，然后配合 requestIdleCallback API, 实现任务拆分、中断与恢复。
 
-![avatar](../img/fiber-tree.png)
+![avatar](/img/fiber-tree.png)
 
 在第一次渲染之后，React 最终得到一个 Fiber 树，它反映了用于渲染 UI 的应用程序的状态。这棵树通常被称为 current 树（当前树） 。当 React 开始处理更新时，它会构建一个所谓的 workInProgress 树（工作过程树） ，它反映了要刷新到屏幕的未来状态。
 
 采用双缓冲技术（double buffering），在 render 的时候创建的那颗 Fiber Tree 被称作为 Current Tree，另外 setState 的时候回重新构建一颗 WorkInProgress Tree，不过不是完全的重新创建，会有一定的策略来复用 Current Tree 里的节点，这样可以节省不必要的 Node 创建。WorkInProgress Tree 构造完毕，得到的就是新的 Fiber Tree，然后喜新厌旧（把 current 指针指向WorkInProgress Tree，丢掉旧的 Fiber Tree）就好了。每个workInProgress tree节点上都有一个effect list用来存放diff结果，当前节点更新完毕会向上merge effect list（queue收集diff结果）。最后根据 EffectList 更新 DOM。
 
-![avatar](../img/worktree.png)
+![avatar](/img/worktree.png)
 
 这样做的好处：
 * 能够复用内部对象（fiber）

@@ -607,4 +607,4 @@ function scheduleRootUpdate(
 ## 总结
 绍两个核心概念：FiberRoot和RootFiber，只有理解并区分这两个概念之后才能更好地理解React的Fiber架构和任务调度阶段中任务的执行过程。
 
-![avatar](img/fiberRoot.png)
+![avatar](/img/render.png)

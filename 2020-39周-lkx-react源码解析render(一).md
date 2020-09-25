@@ -608,3 +608,414 @@ function scheduleRootUpdate(
 绍两个核心概念：FiberRoot和RootFiber，只有理解并区分这两个概念之后才能更好地理解React的Fiber架构和任务调度阶段中任务的执行过程。
 
 ![avatar](/img/render.png)
+
+
+## scheduleRootUpdate
+作用：创建update，返回更新信息对象，将update入队，并开始调度任务
+```js
+function scheduleRootUpdate(
+  current: Fiber,
+  element: ReactNodeList,
+  expirationTime: ExpirationTime,
+  callback: ?Function,
+) {
+
+  const update = createUpdate(expirationTime);   // 创建一个update，返回了一个包含了更新信息的对象
+  update.payload = {element};   // 赋值 update要更新的内容
+
+  callback = callback === undefined ? null : callback;   // render中的回调函数
+  if (callback !== null) {
+    update.callback = callback;
+  }
+
+  enqueueUpdate(current, update);    // 把 update 入队，内部就是一些创建或者获取 queue（链表结构），然后给链表添加一个节点的操作
+  scheduleWork(current, expirationTime);
+
+  return expirationTime;
+}
+
+export function createUpdate(
+  expirationTime: ExpirationTime,
+  suspenseConfig: null | SuspenseConfig,   // 用于标识的配置
+): Update<*> {
+  let update: Update<*> = {
+    expirationTime,   // 更新过期时间
+    suspenseConfig,
+ 	// export const UpdateState = 0;
+  	// export const ReplaceState = 1;
+  	// export const ForceUpdate = 2;
+  	// export const CaptureUpdate = 3;
+
+    tag: UpdateState,     //0更新 1替换 2强制更新 3捕获性的更新
+    payload: null,    //更新内容，比如setState接收的第一个参数，首次render则为element
+    callback: null,    //对应的回调，比如setState({}, callback )
+
+    next: null,     //指向下一个更新
+    nextEffect: null,   //指向下一个side effect
+  };
+  return update;
+}
+```
+## enqueueUpdate
+作用：单向链表，用来存放update，next来串联update
+* queue1取的是fiber.updateQueue;
+* queue2取的是alternate.updateQueue
+* 如果两者均为null，则调用createUpdateQueue()获取初始队列
+* 如果两者之一为null，则调用cloneUpdateQueue()从对方中获取队列
+* 如果两者均不为null，则将update作为lastUpdate
+```js
+function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
+  // fiber即current
+  const alternate = fiber.alternate;    
+  //diff变化记录  alternate即workInProgress   current到alternate即workInProgress有一个映射关系 所以要保证current和workInProgress的updateQueue是一致的
+  let queue1;   // current的队列
+  let queue2;   // alternate的队列
+  if (alternate === null) {  //如果alternate为空
+    queue1 = fiber.updateQueue;
+    queue2 = null;
+    if (queue1 === null) {   // 如果queue1仍为空，则初始化更新队列
+      queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
+    }
+  } else {
+    // 如果alternate不为空，则取各自的更新队列
+    queue1 = fiber.updateQueue;
+    queue2 = alternate.updateQueue;
+    if (queue1 === null) {   
+      if (queue2 === null) {
+        //  初始化
+        queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
+        queue2 = alternate.updateQueue = createUpdateQueue(
+          alternate.memoizedState,
+        );
+      } else {
+        //如果queue2存在但queue1不存在的话，则根据queue2复制queue1
+        queue1 = fiber.updateQueue = cloneUpdateQueue(queue2);  
+      }
+    } else {   //如果alternate不为空，则取各自的更新队列
+      if (queue2 === null) {
+        queue2 = alternate.updateQueue = cloneUpdateQueue(queue1);   
+      } else {
+        // Both owners have an update queue.
+      }
+    }
+  }
+  if (queue2 === null || queue1 === queue2) {
+    //将update放入queue1中
+    appendUpdateToQueue(queue1, update);
+  } else {
+    if (queue1.lastUpdate === null || queue2.lastUpdate === null) {
+      appendUpdateToQueue(queue1, update);
+      appendUpdateToQueue(queue2, update);  //react不想多次将同一个的update放入队列中 如果两个都是空队列，则添加update
+    } else {  //如果两个都不是空队列，由于两个结构共享，所以只在queue1加入update
+      appendUpdateToQueue(queue1, update);
+      queue2.lastUpdate = update;
+    }
+  }
+}
+```
+## scheduleWork
+```js
+export const scheduleWork = scheduleUpdateOnFiber;
+```
+主要干了什么：
+
+* checkForNestedUpdates() 判断是否是无限循环update
+* markUpdateTimeFromFiberToRoot(fiber, expirationTime);   找到rootFiber并遍历更新子节点的expirationTime
+* checkForInterruption(fiber, expirationTime);  判断是否有高优先级任务打断当前正在执行的任务
+* expirationTime === Sync 判断同步还是异步
+* 判断上下文是否为批量更新或是否在commit和render阶段，即是否为第一次渲染，分别进行相应操做
+* 由于首次渲染所以执行performSyncWorkOnRoot(root)来同步调度任务
+
+## performSyncWorkOnRoot
+作用：
+调用 performSyncWorkOnRoot，生成 workInProgress fiber节点，启动 workLoopSync 循环，深度遍历此 fiber 所有后代子节点，并收集 effect 更新；最后调用 commitRoot 提交更新；
+```js
+function performSyncWorkOnRoot(root) {
+  const lastExpiredTime = root.lastExpiredTime;   //检查此根目录上是否有过期的工作。否则，在同步时渲染。
+  const expirationTime = lastExpiredTime !== NoWork ? lastExpiredTime : Sync;
+  if (root.finishedExpirationTime === expirationTime) {   // 当前是否能直接去提交更新，情况少，一般都到else
+    commitRoot(root);
+  } else {
+    flushPassiveEffects();
+
+    // 如果根或到期时间已更改，则丢弃现有堆栈并准备一个新的。
+    // 否则，我们将从中断的地方继续。 
+	// 当前要更新的节点并非是队列中要更新的节点，也就是说被新的高优先级的任务给打断了 
+    if (
+      root !== workInProgressRoot ||
+      expirationTime !== renderExpirationTime
+    ) {
+      prepareFreshStack(root, expirationTime);  // 准备新的堆栈 
+      startWorkOnPendingInteractions(root, expirationTime);   // 开始处理待处理的交互 将调度优先级高的interaction加入到interactions中
+    }
+    if (workInProgress !== null) {
+      do {
+        try {
+          workLoopSync();    
+          break;
+        } catch (thrownValue) {
+          handleError(root, thrownValue);
+        }
+      } while (true);
+      if (workInProgress !== null) {   // 同步渲染 应该完成了整个树，即为null
+		// 报错
+      } else {
+		// 结束同步渲染操作
+      }
+      ensureRootIsScheduled(root);
+    }
+  }
+  return null;
+}
+```
+
+## prepareFreshStack：准备新的堆栈
+设置 workInProgress 相关的各个属性，关键是 workInProgressRoot（workInProgressRoot = root）、workInProgress（调用 createWorkInProgress 生成）；
+```js
+workInProgress = createWorkInProgress(root.current, null, expirationTime);
+```
+## createWorkInProgress
+使用双重缓冲池技术，因为最多只需要一棵树的两个版本。 将“其他”未使用的节点合并，这样就可以自由重用。 为了避免为永不更新的对象的对象分配额外的内存，它是懒创建的。
+
+* 如果 workInProgress 不存在，根据传入的 fiber 复制一份，并将各自的 alternate 属性指向对方；
+* 如果已存在，重置 effectTag 和相关的指针（nextEffect、firstEffect、lastEffect）；
+* 避免 dependencies 属性的引用赋值，其他属性直接赋值；
+
+## workLoopSync
+作用：循环调用peformUnitOfWork处理fiber节点
+```js
+function workLoopSync() {
+  while (workInProgress !== null) {
+    workInProgress = performUnitOfWork(workInProgress);
+  }
+}
+```
+## performUnitOfWork
+作用：主要两个方法：beginWork、completeUnitOfWork
+```js
+function performUnitOfWork(unitOfWork: Fiber): Fiber | null {
+  const current = unitOfWork.alternate;
+
+  startWorkTimer(unitOfWork);    // 初始化 开始work计时  没干啥
+  setCurrentDebugFiberInDEV(unitOfWork);      // dev环境赋值了什么 便于warning
+
+  let next;
+  if (enableProfilerTimer && (unitOfWork.mode & ProfileMode) !== NoMode) {  // 可以通过分析器进行计时
+    startProfilerTimer(unitOfWork);   // 启动分析器的定时器，并赋成当前时间
+    next = beginWork(current, unitOfWork, renderExpirationTime);
+    stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, true);   // 记录分析器的timer运行时间间隔，并停止timer
+  } else {
+    next = beginWork(current, unitOfWork, renderExpirationTime);
+  }
+
+  resetCurrentDebugFiberInDEV();   // 重置dev环境当前debug
+  unitOfWork.memoizedProps = unitOfWork.pendingProps;
+  if (next === null) {   // next为null 说明没有节点，则进行completeUnitOfWork
+    next = completeUnitOfWork(unitOfWork);
+  }
+
+  ReactCurrentOwner.current = null;
+  return next;
+}
+```
+## beginWork
+首先执行beginWork进行节点操作，以及创建子节点，子节点会返回成为next，如果有next就返回。返回到workLoop之后，workLoop会判断是否过期之类的，如果都OK就会再次调用该方法。
+
+注意：dev环境会先执行assignFiberPropertiesInDEV获取信息，为了捕获异常时信息显示，在执行originalBeginWork方法，其他环境会直接执行originalBeginWork方法
+
+* 判断 didReceiveUpdate 的值
+* 如果 current 为空，直接设为 false；
+* 如果 current 不为空
+* props、context 或 type 值改变，设为 true；
+* 当 updateExpirationTime < renderExpirationTime 时，设为 false；此时根据 tag 类型，将 context 信息入栈；
+* 否则设为 false。
+* workInProgress.expirationTime = NoWork;
+* 根据 workInProgress.tag，判断执行哪种类型的更新;
+* 返回 workInProgress.child。
+```js
+beginWork = (current, unitOfWork, expirationTime) => {
+    const originalWorkInProgressCopy = assignFiberPropertiesInDEV(   // dev环境catch报错信息使用
+      dummyFiber,
+      unitOfWork,
+    );
+    try {
+      return originalBeginWork(current, unitOfWork, expirationTime);
+    } catch (originalError) {
+		// 捕获信息处理
+    }
+};
+
+function beginWork(
+  current: Fiber | null,
+  workInProgress: Fiber,
+  renderExpirationTime: ExpirationTime,
+): Fiber | null {
+  const updateExpirationTime = workInProgress.expirationTime;
+
+  if (current !== null) {   // current不为null，则是update 不是初次渲染
+    const oldProps = current.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+
+    if (
+      oldProps !== newProps ||   // 前后props是否相等
+      hasLegacyContextChanged() ||   // 是否有老版本context使用并且变化
+      // Force a re-render if the implementation changed due to hot reload:  当前节点是否需要更新以及他的更新优先级是否在当前更新优先级之前
+      (__DEV__ ? workInProgress.type !== current.type : false)  
+    ) {
+      didReceiveUpdate = true;
+    } else if (updateExpirationTime < renderExpirationTime) {
+      didReceiveUpdate = false;
+      switch (workInProgress.tag) {
+		case ...
+      }
+  } else {
+    didReceiveUpdate = false;
+  }
+
+  workInProgress.expirationTime = NoWork;
+  switch (workInProgress.tag) {
+    case IndeterminateComponent:
+    case LazyComponent: 
+    case FunctionComponent: 
+    case ClassComponent: {
+      const Component = workInProgress.type;
+      const unresolvedProps = workInProgress.pendingProps;
+      const resolvedProps =
+        workInProgress.elementType === Component
+          ? unresolvedProps
+          : resolveDefaultProps(Component, unresolvedProps);
+      return updateClassComponent(
+        current,
+        workInProgress,
+        Component,
+        resolvedProps,
+        renderExpirationTime,
+      );
+    } 
+    case HostRoot:
+    case HostComponent:
+    case HostText:
+    case SuspenseComponent:
+    case HostPortal:
+    case ForwardRef:
+    case Fragment:
+    case Mode:
+    case Profiler:
+    case ContextProvider:
+    case ContextConsumer:
+    case MemoComponent:
+    case SimpleMemoComponent:
+    case IncompleteClassComponent: 
+    case SuspenseListComponent: 
+    case FundamentalComponent: 
+    case ScopeComponent: 
+  }
+}
+```
+## completeUnitOfWork
+
+如果next不存在，说明当前节点向下遍历子节点已经到底了，说明这个子树侧枝已经遍历完，可以完成这部分工作了。就执行completeUnitOfWork，completeUnitOfWork就是处理一些effact tag，他会一直往上返回直到root节点或者在某一个节点发现有sibling兄弟节点为止。如果到了root那么他的返回也是null，代表整棵树的遍历已经结束了，可以commit了，如果遇到兄弟节点就返回该节点，因为这个节点可能也会存在子节点，需要通过beginWork进行操作。
+
+作用：完成当前节点的work，并赋值Effect链，然后移动到兄弟节点，重复该操作，当没有更多兄弟节点时，返回至父节点，最终返回至root节点
+```js
+function completeUnitOfWork(unitOfWork: Fiber): Fiber | null {
+  workInProgress = unitOfWork;  //从下至上，移动到该节点的兄弟节点，如果一直往上没有兄弟节点，就返回父节点 当前节点为img
+  do {
+    const current = workInProgress.alternate;   // 获取当前节点
+    const returnFiber = workInProgress.return;   // 获取父节点
+
+    // 检查该节点是否有异常抛出
+    if ((workInProgress.effectTag & Incomplete) === NoEffect) {
+      setCurrentDebugFiberInDEV(workInProgress);
+      let next;
+      if (  // 如果不能使用分析器的 timer 的话，直接执行completeWork，
+        !enableProfilerTimer ||
+        (workInProgress.mode & ProfileMode) === NoMode
+      ) {
+        next = completeWork(current, workInProgress, renderExpirationTime);
+      } else {
+        startProfilerTimer(workInProgress);
+        next = completeWork(current, workInProgress, renderExpirationTime);
+        stopProfilerTimerIfRunningAndRecordDelta(workInProgress, false);
+      }
+      stopWorkTimer(workInProgress);
+      resetCurrentDebugFiberInDEV();
+      resetChildExpirationTime(workInProgress);  //更新该节点的 work 时长和子节点的 expirationTime
+
+      if (next !== null) {
+        return next;   //返回 next，以便执行新 work
+      }
+  
+      if (  //如果父节点存在，并且其 Effect 链没有被赋值的话
+        returnFiber !== null &&
+        (returnFiber.effectTag & Incomplete) === NoEffect
+      ) {
+        //子节点的完成顺序会影响副作用的顺序
+        if (returnFiber.firstEffect === null) {    //如果父节点没有挂载firstEffect的话，将当前节点的firstEffect赋值给父节点的firstEffect
+          returnFiber.firstEffect = workInProgress.firstEffect;
+        }
+        if (workInProgress.lastEffect !== null) {  //同上，根据当前节点的lastEffect，初始化父节点的lastEffect
+          if (returnFiber.lastEffect !== null) {  //如果父节点的lastEffect有值的话，将nextEffect赋值  目的是串联Effect链
+            returnFiber.lastEffect.nextEffect = workInProgress.firstEffect;
+          }
+          returnFiber.lastEffect = workInProgress.lastEffect;
+        }
+
+        const effectTag = workInProgress.effectTag;   //获取副作用标记
+
+        if (effectTag > PerformedWork) {  //如果该副作用标记大于PerformedWork
+          if (returnFiber.lastEffect !== null) {  //当父节点的lastEffect不为空的时候，将当前节点挂载到父节点的副作用链的最后
+            returnFiber.lastEffect.nextEffect = workInProgress;
+          } else {  //否则，将当前节点挂载在父节点的副作用链的头-firstEffect上
+            returnFiber.firstEffect = workInProgress;
+          }
+          returnFiber.lastEffect = workInProgress;  //无论父节点的lastEffect是否为空，都将当前节点挂载在父节点的副作用链的lastEffect上
+        }
+      }
+    } else {  //如果该 fiber 节点未能完成 work 的话(报错)
+      const next = unwindWork(workInProgress, renderExpirationTime);  //节点未能完成更新，捕获其中的错误
+
+      if (   //由于该 fiber 未能完成，所以不必重置它的 expirationTime
+        enableProfilerTimer &&
+        (workInProgress.mode & ProfileMode) !== NoMode
+      ) {
+        stopProfilerTimerIfRunningAndRecordDelta(workInProgress, false);
+
+        let actualDuration = workInProgress.actualDuration;   //虽然报错了，但仍然会累计 work 时长
+        let child = workInProgress.child;
+        while (child !== null) {
+          actualDuration += child.actualDuration;
+          child = child.sibling;
+        }
+        workInProgress.actualDuration = actualDuration;
+      }
+
+      if (next !== null) {  //如果next存在，则表示产生了新 work
+        stopFailedWorkTimer(workInProgress);  //停止失败的 work 计时，可不看
+        next.effectTag &= HostEffectMask;  //更新其 effectTag，标记是 restart 的
+        return next;   //返回 next，以便执行新 work
+      }
+      stopWorkTimer(workInProgress);
+
+      if (returnFiber !== null) {  //如果父节点存在的话，重置它的 Effect 链，标记为「未完成」
+        returnFiber.firstEffect = returnFiber.lastEffect = null;
+        returnFiber.effectTag |= Incomplete;
+      }
+    }
+
+    const siblingFiber = workInProgress.sibling;  //获取兄弟节点
+    if (siblingFiber !== null) {
+      return siblingFiber;
+    }
+    //如果能执行到这一步的话，说明 siblingFiber 为 null，
+    workInProgress = returnFiber;  //那么就返回至父节点
+  } while (workInProgress !== null);
+
+  //当执行到这里的时候，说明遍历到了 root 节点，已完成遍历
+  if (workInProgressRootExitStatus === RootIncomplete) {  //更新workInProgressRootExitStatus的状态为「已完成」
+    workInProgressRootExitStatus = RootCompleted;
+  }
+  return null;
+}
+```
+

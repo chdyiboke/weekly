@@ -1,7 +1,7 @@
 # react源码render解析
 
 ## React更新的方式
-* ReactDOM.render（）|| 水合物（ReactDOMServer渲染）
+* ReactDOM.render（）|| hydrate（ReactDOMServer渲染）
 * setState
 * forceUpdate
 
@@ -489,7 +489,7 @@ export function updateContainer(
   callback: ?Function,
 ): ExpirationTime {
   const current = container.current;   // 对应的是一个 fiber 对象
-  const currentTime = requestCurrentTime();   //  // 获取当前任务时间   过期时间是通过添加当前时间(开始时间)来计算的
+  const currentTime = requestCurrentTime();   // 获取当前任务时间   过期时间是通过添加当前时间(开始时间)来计算的
 
   const suspenseConfig = requestCurrentSuspenseConfig();
   // 通过 expirationTime 对节点计算过期时间
@@ -599,10 +599,9 @@ function scheduleRootUpdate(
 
 接下来我们将 callback 赋值给 update 的属性，这里的 callback 还是 ReactDom.render 的第三个参数。
 
-然后我们将刚才创建出来的 update 对象插入队列中，enqueueUpdate 函数内部分支较多且代码简单，这里就不再贴出代码了，有兴趣的可以自行阅读。函数核心作用就是创建或者获取一个队列，然后把 update 对象入队。
+然后我们将刚才创建出来的 update 对象插入队列中，函数核心作用就是创建或者获取一个队列，然后把 update 对象入队。
 
 最后调用 scheduleWork 函数。
-
 
 
 ## 总结

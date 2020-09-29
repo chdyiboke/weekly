@@ -19,7 +19,7 @@ npm i jest --save-dev
 可以使用 jest 命令运行 test。
 
 ```
-Jest将使用以下任何流行的命名约定查找测试文件：
+Jest将使用以下任何命名约定查找测试文件：
 
 文件夹中带有.js后缀的__tests__文件。
 带.test.js后缀的文件。
@@ -76,6 +76,7 @@ module.exports = {
 Jest 的配置可以在 package.json 项目的文件中定义，也可以通过 jest.config.js 文件或--config
 
 ```
+<!-- jest.config.js -->
 module.exports = {
   verbose: true,
   collectCoverage: true,
@@ -222,8 +223,7 @@ import { act } from "react-dom/test-utils";
   });
 ```
 
-只是断言其内部状态，用户看到的不一定是测试那样。[api文档](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderergetinstance)
-
+只是断言其内部状态，用户看到的不一定是测试那样。[api 文档](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderergetinstance)
 
 #### 正确的方式，测试 React 组件
 
@@ -289,9 +289,10 @@ beforeEach(() => {
 
 #### 用 Jest 模拟 Fetch API 调用
 
-在大多数情况下，在测试期间没有理由调用外部API。
+在大多数情况下，在测试期间没有理由调用外部 API。
 
-Mock响应模拟API： jest.spyOn(object, methodName).mockImplementation(() => customImplementation)
+Mock 响应模拟 API： jest.spyOn(object, methodName).mockImplementation(() => customImplementation)
+
 ```
 let container;
 
@@ -325,12 +326,12 @@ beforeEach(() => {
 
 ### Enzyme
 
-官方测试工具库的封装，它模拟了 jQuery 的API，非常直观，易于使用和学习。
+官方测试工具库的封装，它模拟了 jQuery 的 API，非常直观，易于使用和学习。
 它提供三种测试方法。
 
-* shallow：虚拟 DOM
-* render：静态的HTML字符
-* mount： 真实DOM节点
+- shallow：虚拟 DOM
+- render：静态的 HTML 字符
+- mount： 真实 DOM 节点
 
 新建 jest.config.js(同上)  
 新建 setupTests.js
@@ -369,19 +370,25 @@ describe('Enzyme Render', function () {
 });
 
 <!-- 点击添加按钮，会新增一个Todo项 -->
-  it('Turning a Todo item into Done', function () {
-    let app = mount(<App/>);
-    let todoItem = app.find('.todo-text').at(0);
-    todoItem.simulate('click');
-    expect(todoItem.hasClass('todo-done')).to.equal(true);
+describe('DOM Rendering', function (done) {
+  it('Add an new Todo item, when click the new todo button', function () {
+    const app = TestUtils.renderIntoDocument(<App/>);
+    const appDOM = findDOMNode(app);
+    let todoItemsLength = appDOM.querySelectorAll('.todo-text').length;
+    let addInput = appDOM.querySelector('input');
+    addInput.value = 'Todo four';
+    let addButton = appDOM.querySelector('.add-todo button');
+    TestUtils.Simulate.click(addButton);
+    expect(appDOM.querySelectorAll('.todo-text').length).to.be.equal(todoItemsLength + 1);
   });
 });
 
 ```
+
 ## 参考
 
-* 《Testing React Components: The Mostly Definitive Guide》 ：https://www.valentinog.com/blog/testing-react/
-* 阮一峰 react 测试入门教程： http://www.ruanyifeng.com/blog/2016/02/react-testing-tutorial.html
-* Next.js 项目单元测试的配置（Jest+Enzyme）: https://juejin.im/post/6844904111184281608
-* react 官网测试指南：https://reactjs.org/docs/test-utils.html
-* Jest 进行 React 单元测试详情: https://juejin.im/post/6844903654294716423
+- 《Testing React Components: The Mostly Definitive Guide》 ：https://www.valentinog.com/blog/testing-react/
+- 阮一峰 react 测试入门教程： http://www.ruanyifeng.com/blog/2016/02/react-testing-tutorial.html
+- Next.js 项目单元测试的配置（Jest+Enzyme）: https://juejin.im/post/6844904111184281608
+- react 官网测试指南：https://reactjs.org/docs/test-utils.html
+- Jest 进行 React 单元测试详情: https://juejin.im/post/6844903654294716423

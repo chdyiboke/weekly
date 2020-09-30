@@ -27,7 +27,8 @@ switch (workInProgress.tag) {
 }
 ```
 
-## HostRoot（<div id="root" />）
+## HostRoot
+<div id="root" />
 ```js
 case HostRoot:
   return updateHostRoot(current, workInProgress, renderExpirationTime);

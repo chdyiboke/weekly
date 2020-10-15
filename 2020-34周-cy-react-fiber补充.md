@@ -98,6 +98,9 @@ https://juejin.im/post/6859528127010471949
 
 
 ### 深度优先 算法
+completeUnitOfWork， 同时在 completeUnitOfWork 方法中构建 effect-list 链表，该 effect list 在下一个 commit 阶段非常重要！！！
+
+![fiber调度](https://admin.indepth.dev/content/images/2019/08/tmp2.gif)
 
 ```
 function walk(o) {

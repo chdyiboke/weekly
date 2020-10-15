@@ -39,59 +39,13 @@ React Fiber把更新过程碎片化，执行过程如下面的图所示，每执
 道理很简单，但是React实现这一点却不容易，折腾了两年多！
 
 
-## 代码目录
-
-React的相关代码都放在packages文件夹里
-
-```
-├── packages --------------------- React实现的相关代码
-│   ├── create-subscription ------ 在组件里订阅额外数据的工具
-│   ├── events ------------------- React事件相关
-│   ├── react -------------------- 组件与虚拟DOM模型
-│   ├── react-art ---------------- 画图相关库
-│   ├── react-dom ---------------- ReactDom
-│   ├── react-native-renderer ---- ReactNative
-│   ├── react-reconciler --------- React调制器
-│   ├── react-scheduler ---------- 规划React初始化，更新等等
-│   ├── react-test-renderer ------ 实验性的React渲染器
-│   ├── shared ------------------- 公共代码
-│   ├── simple-cache-provider ---- 为React应用提供缓存
-
-```
-
-我们主要关注 `reconciler` 这个模块， packages/react-reconciler/src
-
-```
-
-├── react-reconciler ------------------------ reconciler相关代码
-│   ├── ReactFiberReconciler.js ------------- 模块入口
-├─ Model ----------------------------------------
-│   ├── ReactFiber.js ----------------------- Fiber相关
-│   ├── ReactUpdateQueue.js ----------------- state操作队列
-│   ├── ReactFiberRoot.js ------------------- RootFiber相关
-├─ Flow -----------------------------------------
-│   ├── ReactFiberScheduler.js -------------- 1.总体调度系统
-│   ├── ReactFiberBeginWork.js -------------- 2.Fiber解析调度
-│   ├── ReactFiberCompleteWork.js ----------- 3.创建DOM 
-│   ├── ReactFiberCommitWork.js ------------- 4.DOM布局
-├─ Assist ---------------------------------------
-│   ├── ReactChildFiber.js ------------------ children转换成subFiber
-│   ├── ReactFiberTreeReflection.js --------- 检索Fiber
-│   ├── ReactFiberClassComponent.js --------- 组件生命周期
-│   ├── stateReactFiberExpirationTime.js ---- 调度器优先级
-│   ├── ReactTypeOfMode.js ------------------ Fiber mode type
-│   ├── ReactFiberHostConfig.js ------------- 调度器调用渲染器入口
-
-```
-
+## fiber 效率
 Fiber reconciler 使用了scheduling(调度)这一过程， 每次只做一个很小的任务，做完后能够“喘口气儿”，回到主线程看下有没有什么更高优先级的任务需要处理，如果有则先处理更高优先级的任务，没有则继续执行(cooperative scheduling 合作式调度)。
 
 网友测试使用React V16，当DOM节点数量达到100000时， 页面能正常加载，输入交互也正常了；
 
 
-## Fiber 部分源码
-
-https://juejin.im/post/6859528127010471949
+## Fiber work部分理解
 
 
 当 React 遍历 current 树时，它会为每一个存在的 fiber 节点创建了一个替代节点，这些节点构成一个 workInProgress 树。后续所有发生 work 的地方都是在 workInProgress 树中执行。
@@ -165,8 +119,19 @@ function workLoop(isYieldy) {
 
 ```
 
-### 附：
-enqueueSetState
+### effect-list 链表
+
+例如，我们的更新引起c2被插入到DOM，d2并c1更改其属性，并b2解雇生命周期方法。效果列表会将它们链接在一起，以便React以后可以跳过其他节点：
+[React effect](https://admin.indepth.dev/content/images/2019/07/image-52.png)
+
+effects list，上图可以表示为线性列表，如下所示：
+
+[React effect list](https://admin.indepth.dev/content/images/2019/07/image-53.png)
+
+
+
+### enqueueSetState
+
 每个 React 组件都有一个相关联的 updater，作为组件层和核心库之间的桥梁。react.Component 本质上就是一个函数，在它的原型对象上挂载了 setState 方法
 
 // Component原型对象挂载
@@ -176,19 +141,62 @@ enqueueSetState
     this.updater.enqueueSetState(this, partialState, callback, 'setState'); 
  };
 ```
-与 render 阶段不同，commit 阶段的执行始终是同步的
-
-
 
 ## QA
 setstate是异步的嘛？
-看是否能命中 batchUpdate（批量更新） 。setTimeout等定时器不能命中，所以是同步等。
+看是否能命中 batchUpdate（批量更新） 。特殊：setTimeout等定时器不能命中，所以在setTimeout里面是同步的。
 
 未来 React 希望做到不管里你在哪里写 setState，一个 tick 内的多次 setState 都给你合并掉。
 
 
 
+## 附 react源码目录
+
+React的相关代码都放在packages文件夹里
+
+```
+├── packages --------------------- React实现的相关代码
+│   ├── create-subscription ------ 在组件里订阅额外数据的工具
+│   ├── events ------------------- React事件相关
+│   ├── react -------------------- 组件与虚拟DOM模型
+│   ├── react-art ---------------- 画图相关库
+│   ├── react-dom ---------------- ReactDom
+│   ├── react-native-renderer ---- ReactNative
+│   ├── react-reconciler --------- React调制器
+│   ├── react-scheduler ---------- 规划React初始化，更新等等
+│   ├── react-test-renderer ------ 实验性的React渲染器
+│   ├── shared ------------------- 公共代码
+│   ├── simple-cache-provider ---- 为React应用提供缓存
+
+```
+
+我们主要关注 `reconciler` 这个模块， packages/react-reconciler/src
+
+```
+
+├── react-reconciler ------------------------ reconciler相关代码
+│   ├── ReactFiberReconciler.js ------------- 模块入口
+├─ Model ----------------------------------------
+│   ├── ReactFiber.js ----------------------- Fiber相关
+│   ├── ReactUpdateQueue.js ----------------- state操作队列
+│   ├── ReactFiberRoot.js ------------------- RootFiber相关
+├─ Flow -----------------------------------------
+│   ├── ReactFiberScheduler.js -------------- 1.总体调度系统
+│   ├── ReactFiberBeginWork.js -------------- 2.Fiber解析调度
+│   ├── ReactFiberCompleteWork.js ----------- 3.创建DOM 
+│   ├── ReactFiberCommitWork.js ------------- 4.DOM布局
+├─ Assist ---------------------------------------
+│   ├── ReactChildFiber.js ------------------ children转换成subFiber
+│   ├── ReactFiberTreeReflection.js --------- 检索Fiber
+│   ├── ReactFiberClassComponent.js --------- 组件生命周期
+│   ├── stateReactFiberExpirationTime.js ---- 调度器优先级
+│   ├── ReactTypeOfMode.js ------------------ Fiber mode type
+│   ├── ReactFiberHostConfig.js ------------- 调度器调用渲染器入口
+
+```
 
 
+参考
+[外网 英文 可能是点击最多的Fiber架构简介-英文](https://indepth.dev/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react/)
 
-
+[React Fiber 源码解析](https://juejin.im/post/6859528127010471949)

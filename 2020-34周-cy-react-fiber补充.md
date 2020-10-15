@@ -122,11 +122,11 @@ function workLoop(isYieldy) {
 ### effect-list 链表
 
 例如，我们的更新引起c2被插入到DOM，d2并c1更改其属性，并b2解雇生命周期方法。效果列表会将它们链接在一起，以便React以后可以跳过其他节点：
-[React effect](https://admin.indepth.dev/content/images/2019/07/image-52.png)
+![React effect](https://admin.indepth.dev/content/images/2019/07/image-52.png)
 
 effects list，上图可以表示为线性列表，如下所示：
 
-[React effect list](https://admin.indepth.dev/content/images/2019/07/image-53.png)
+![React effect list](https://admin.indepth.dev/content/images/2019/07/image-53.png)
 
 
 

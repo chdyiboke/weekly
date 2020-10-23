@@ -1,6 +1,6 @@
 # 理解bind、call、apply
 
-## call、apply、bind使用和区别
+## 1. call、apply、bind使用和区别
 
 这三个函数的存在作用是什么？为了改变函数执行时的上下文。
 
@@ -44,6 +44,7 @@ call 与 apply的区别：
 ```
 let arr1 = [1, 2, 19, 6];
 //例子：求数组中的最值
+Math.max(1,1,2,19,6);
 Math.max.bind(null, 1,2,19,6)();
 Math.max.call(null, 1,2,19,6); // 19
 Math.max.call(null, arr1); // NaN
@@ -51,7 +52,7 @@ Math.max.apply(null, arr1); //  19 直接可以用arr1传递进去
 
 ```
 
-## 应用
+## 2. 应用
 
 
 ### 将伪数组转化为数组
@@ -137,9 +138,75 @@ cat.showName();   //TONY
 ```
 
 
-## 实现bind
+## 3. 实现bind
+
+```
+Function.prototype.bind2 = function(context) {
+    // 将this作保存,代表被绑定的函数
+    var self = this;
+    return function() {
+        // 绑定函数可能会有返回值，所以这里要return一下
+        return self.apply(context);
+    }
+}
+
+```
+
+```
+function Foo(){
+    console.log(this.a);
+    this.a=1;
+}
+Foo.prototype.show=function() {console.log(this.a)};
+Foo(); // undefined
+var obj1=new Foo();
+obj1.show();
+
+var bar=Foo.bind2({a:2});
+bar(); // 2
+var obj2=new bar();
+obj2.show(); // TypeError: obj2.show is not a function
+
+```
+因为bind函数内部没有维护原型关系的继承，所以对象obj2不能访问到原型上的show方法。
+
+### 源码分析
+下面是 MDN上提供的polyfill
+
+```
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function(oThis) {
+    if (typeof this !== 'function') {
+      throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable')
+    }
+    var aArgs   = Array.prototype.slice.call(arguments, 1),
+        fToBind = this,
+        fNOP    = function() {},
+        fBound  = function() {
+          // 这段代码会判断硬绑定函数是否是被new调用，如果是的话就会使用新创建的this替换硬绑定的this
+          return fToBind.apply(this instanceof fNOP 
+                 ? this
+                 : oThis,
+                 aArgs.concat(Array.prototype.slice.call(arguments)))
+        }
+    // 维护原型关系
+    if (this.prototype) {
+        // Function.prototype doesn't have a prototype property
+        fNOP.prototype = this.prototype; 
+    }
+    fBound.prototype = new fNOP()
+    return fBound
+  }
+}
+
+```
+
+![维护原型关系](/img/bindthis.png)
+
 
 ## 参考
 
+[理解bind、call、apply](https://juejin.im/post/6844903567967387656)  
+[bind函数polyfill源码解析](https://juejin.im/post/6844903639220224008)
 
-https://juejin.im/post/6844903567967387656
+

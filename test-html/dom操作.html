@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>dom操作</title>
+    <style>
+    .button {
+      display: inline-block;
+      margin-right: 16px;
+      /* Other button styles */
+    }
+    .li {
+      color: red;
+    }
+    </style>
+</head>
+<body>
+    <header> <!-- 本站所有网页的统一主标题 -->
+      <h1>聆听电子天籁之音</h1>
+    </header>
+     
+    <nav> <!-- 本站统一的导航栏 -->
+      <ul>
+        <li><a href="#">主页</a></li>
+        <!-- 共n个导航栏项目，省略…… -->
+      </ul>
+ 
+      <form> <!-- 搜索栏是站点内导航的一个非线性的方式。 -->
+        <input type="search" name="q" placeholder="要搜索的内容">
+        <button type="submit">搜索</button>
+      </form>
+    </nav>
+     
+    <main> <!-- 网页主体内容 -->
+
+      <h1>新的插入方法</h1>
+      <ol id="ol">
+        <li class="li">0</li>
+        <li class="li">1</li>
+        <li class="li">2</li>
+      </ol>
+      <div>
+          <object type="image/svg+xml" data="/article/modifying-document/before-prepend-append-after.svg" width="409" height="203" class="image__image">
+            <img src="https://zh.javascript.info/article/modifying-document/before-prepend-append-after.svg" alt="" width="409" height="203">
+          </object>
+      </div>
+
+      <h1>elem.insertAdjacentHTML(where, html字符串)</h1>
+      <div>这些方法只能用来插入 DOM 节点或文本片段。所以有了常用，elem.insertAdjacentHTML(where, html字符串) 字符串会被“作为 HTML” 插入！！！</div>
+      <div>同样的效果，更加方便！！！</div>
+      <div><div>      
+          <ol id="div">
+          <li class="li">0</li>
+          <li class="li">1</li>
+          <li class="li">2</li>
+        </ol></div></div>
+        <img src="https://zh.javascript.info/article/modifying-document/insert-adjacent.svg" alt="" width="409" height="203">
+   
+        <h1>节点移除 node.remove()</h1>
+        <h1>克隆节点：cloneNode</h1>
+        <div>调用 elem.cloneNode(true) 来创建元素的一个“深”克隆 — 具有所有特性（attribute）和子元素。如果我们调用 elem.cloneNode(false)，那克隆就不包括子元素。</div>
+    </main>
+     
+    <footer> <!-- 本站所有网页的统一页脚 -->
+      <p>© 2050 菜菜的测试保留所有权利</p>
+    </footer>
+</body>
+  <script>
+    var ol =document.querySelector("#ol");
+    ol.before('node.before'); // 将字符串 "before" 插入到 <ol> 前面
+    ol.after('node.after'); // 将字符串 "after" 插入到 <ol> 后面
+
+    let liFirst = document.createElement('li');
+    liFirst.innerHTML = 'node.prepend';
+    ol.prepend(liFirst); // 将 liFirst 插入到 <ol> 的最开始
+
+    let liLast = document.createElement('li');
+    liLast.innerHTML = 'node.append';
+    ol.append(liLast);
+  </script>
+  <script>
+    var div = document.querySelector("#div");
+    div.insertAdjacentHTML('beforebegin', '<p>beforebegin</p>');
+    div.insertAdjacentHTML('afterbegin', '<li>afterbegin</li>');
+    div.insertAdjacentHTML('beforeend', '<li>beforeend</li>');
+    div.insertAdjacentHTML('afterend', '<p>afterend</p>');
+  </script>
+</html>

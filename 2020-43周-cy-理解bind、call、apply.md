@@ -164,11 +164,11 @@ obj1.show();
 
 var bar=Foo.bind2({a:2});
 bar(); // 2
-var obj2=new bar();
+var obj2=new bar(); // this绑定中new操作具有最高的优先级，如果执行new操作，bind不起作用
 obj2.show(); // TypeError: obj2.show is not a function
 
 ```
-因为bind函数内部没有维护原型关系的继承，所以对象obj2不能访问到原型上的show方法。
+因为上面实现 bind2 函数内部没有维护原型关系的继承，所以对象obj2不能访问到原型上的show方法。
 
 ### 源码分析
 下面是 MDN上提供的polyfill
@@ -183,7 +183,7 @@ if (!Function.prototype.bind) {
         fToBind = this,
         fNOP    = function() {},
         fBound  = function() {
-          // 这段代码会判断硬绑定函数是否是被new调用，如果是的话就会使用新创建的this替换硬绑定的this
+          // 如果new，用新创建的this替换硬绑定的this
           return fToBind.apply(this instanceof fNOP 
                  ? this
                  : oThis,
@@ -201,6 +201,7 @@ if (!Function.prototype.bind) {
 
 ```
 
+
 ![维护原型关系](/img/bindthis.png)
 
 
@@ -209,4 +210,26 @@ if (!Function.prototype.bind) {
 [理解bind、call、apply](https://juejin.im/post/6844903567967387656)  
 [bind函数polyfill源码解析](https://juejin.im/post/6844903639220224008)
 
+ps:
+```
+instanceof (A,B) = {
+    var L = A.__proto__;
+    var R = B.prototype;
+    if(L === R) {
+        //A的内部属性__proto__指向B的原型对象
+        return true;
+    }
+    return false;
+}
 
+```
+
+例子 ===>>>
+
+```
+[] instanceof Object //true
+
+function Person(){};
+new Person() instanceof Person; // true
+new Person instanceof Object; // true
+```

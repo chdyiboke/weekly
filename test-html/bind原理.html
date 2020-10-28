@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>bind</title>
+    <style>
+    .button {
+      display: inline-block;
+      margin-right: 16px;
+      /* Other button styles */
+    }
+    </style>
+</head>
+<body>
+    <header> <!-- 本站所有网页的统一主标题 -->
+      <h1>聆听电子天籁之音</h1>
+    </header>
+     
+    <nav> <!-- 本站统一的导航栏 -->
+      <ul>
+        <li><a href="#">主页</a></li>
+        <!-- 共n个导航栏项目，省略…… -->
+      </ul>
+ 
+      <form> <!-- 搜索栏是站点内导航的一个非线性的方式。 -->
+        <input type="search" name="q" placeholder="要搜索的内容">
+        <button type="submit">搜索</button>
+      </form>
+    </nav>
+     
+    <main> <!-- 网页主体内容 -->
+      <article>
+        <!-- 此处包含一个 article（一篇文章），内容略…… -->
+        <div class="wrapper">
+          <a class="button" href="">Save changes</a>
+          <a class="button" href="">Cancel</a>
+        </div>
+      </article>
+       
+      <aside> <!-- 侧边栏在主内容右侧 -->
+        <h2>相关链接</h2>
+        <ul>
+          <li><a href="#">这是一个超链接</a></li>
+          <!-- 侧边栏有n个超链接，略略略…… -->
+        </ul>
+      </aside>
+    </main>
+     
+    <footer> <!-- 本站所有网页的统一页脚 -->
+      <p>© 2050 某某保留所有权利</p>
+    </footer>
+</body>
+  <script>
+  if (!Function.prototype.bind1) {
+    Function.prototype.bind1 = function(oThis) {
+      if (typeof this !== 'function') {
+        throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable')
+      }
+      debugger;
+      var aArgs   = Array.prototype.slice.call(arguments, 1),
+          fToBind = this,
+          fNOP    = function() {},
+          fBound  = function() {
+            console.log(fToBind, this, oThis);
+            debugger;
+            // 这段代码会判断硬绑定函数是否是被new调用，如果是的话就会使用新创建的this替换硬绑定的this
+            return fToBind.apply(this instanceof fNOP 
+                  ? this // Foo a=1;
+                  : oThis, // Object a=2;
+                  aArgs.concat(Array.prototype.slice.call(arguments)))
+          }
+      // 维护原型关系
+      if (this.prototype) {
+          // Function.prototype doesn't have a prototype property
+          fNOP.prototype = this.prototype; 
+      }
+      fBound.prototype = new fNOP()
+      return fBound
+    }
+  }
+
+  function Foo(){
+    console.log(this.a);
+    this.a=1;
+  }
+  Foo.prototype.show=function() {console.log(this.a)};
+
+  var bar=Foo.bind1({a:2});
+  var obj2=new bar();
+  obj2.show();
+
+  </script>
+</html>

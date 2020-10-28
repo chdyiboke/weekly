@@ -104,7 +104,7 @@ function reconcileChildFibers(   // diff算法实现
 * 文本节点执行reconcileSingleTextNode方法
 * 数组类型省略
 
-### 对象
+### 对象(reconcileSingleElement)
 流程：
 ![avatar](/img/diffObj.png)
 ```js

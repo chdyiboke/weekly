@@ -68,8 +68,8 @@ let g =() => ({name :'Alice', location: 'Baijing'});
 f = g;
 
 // 4) 类兼容性 
-// 静态成员和构造函数不在比较的范围
-// 类的私有成员和受保护成员会影响兼容性
+// 【静态成员】 和 【构造函数】 不在比较的范围 ==》可兼容
+// 类的 【私有成员】 和 【受保护成员】 会影响兼容性 ==》不可兼容
 class Animala {
     feet: number;
     constructor(name: string, numFeet: number) { }
@@ -111,3 +111,155 @@ identity = reverse;  // OK
 结构之间：少兼容多
 函数之间：多兼容少
 **/
+
+
+// 下一节：类型保护机制
+
+enum Type { Strong, Week };
+
+class Java{
+    helloJava(){
+        console.log("hello Java");
+    }
+    java: any;
+}
+
+class Javascript{
+    helloJavascript(){
+        console.log("hello Javascript");
+    }
+    javascript: any;
+}
+
+// 返回值很特殊：lang is Java
+function isJava(lang: Java | Javascript): lang is Java {
+    return (lang as Java).helloJava !== undefined
+}
+
+function getLanguage(type: Type){
+    let lang = type === Type.Strong ?new Java() : new Javascript();
+    /** 类型保护
+    * 4种方法
+    * a. instanceof
+    * b. in 加入属性 
+    * c. typeof
+    * d. 类型保护函数
+    */
+
+    // a. instanceof 方式
+    if(lang instanceof Java){
+        lang.helloJava();
+    }else{
+        lang.helloJavascript();
+    }
+    // b. in 方式
+    // if('java' in lang){
+    //     lang.helloJava();
+    // }else{
+    //     lang.helloJavascript();
+    // }
+
+    // * c. typeof 方式
+    // if(typeof x === 'string'){
+    //     console.log(x.length);
+    // }else{
+    //     console.log(x);
+    // }
+
+    // * d. 类型保护函数 方式
+    if(isJava(lang)){
+        lang.helloJava();
+    }else{
+        lang.helloJavascript();
+    }
+    // if((lang as Java).helloJava){
+    //     (lang as Java).helloJava();
+    // } else {
+    //     (lang as Javascript).helloJavascript();
+    // }
+
+    return lang;
+}
+
+getLanguage(Type.Strong); // 返回 Java实例
+
+
+
+// 下一节：高级类型
+
+// 交叉类型： &
+// 将多个类型合并成一个类型、所有类型的并集。
+
+// 联合类型： |
+// 类型不确定，为声明类型其中的一个
+let al: number | string = 'a';
+let bl: 'a' | 'b' = 'c';
+let cl: 'a' | 1 = 'a';
+
+interface DogInterface {
+    run():void;
+}
+
+interface CatInterface {
+    jump():void;
+}
+
+let pet: DogInterface & CatInterface ={
+    run(){}, jump(){}
+}
+
+class Dog implements DogInterface{
+    eat(){};
+    run(){};
+}
+
+class Cat implements CatInterface{
+    eat(){};
+    jump(){};
+}
+
+enum Master { Boy, Girl }
+function getPet(master: Master){
+ let pet = master === Master.Boy? new Dog(): new Cat();
+ pet.eat(); // ！！！联合类型不确定类型时，只能访问共有方法
+ return pet;
+}
+
+// 区分类型：可区分的联合类型
+
+
+// 索引类型： keyof
+interface Obj{
+    a:number;
+    b:string;
+}
+
+let key: keyof Obj;
+
+function pluck<T, K extends keyof T>(o: T, names: K[]): T[K][] {
+    return names.map(n => o[n]);
+  }
+  
+  interface Person {
+      name: string;
+      age: number;
+  }
+  let person: Person = {
+      name: 'Jarid',
+      age: 35
+  };
+  let strings: string[] = pluck(person, ['name']); // ok, string[]
+
+// 映射类型： 
+
+interface Obj {
+    cc: string;
+}
+
+type ReadonlyObj = Readonly<Obj>;
+type PersonPartial = Partial<Person>; // 可选
+// type Readonly<T> = {
+//     readonly [P in keyof T]: T[P];
+// };
+
+

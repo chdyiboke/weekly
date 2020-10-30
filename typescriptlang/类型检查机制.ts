@@ -262,4 +262,28 @@ type PersonPartial = Partial<Person>; // 可选
 //     readonly [P in keyof T]: T[P];
 // };
 
+// 条件类型：T extends U? X:Y
+// 如果 T 可以赋值给 U 那么就是 X 类型。
+
+type TypeName<T> = 
+    T extends string ? "string" :
+    T extends number ? "number" :
+    T extends boolean ? "boolean" :
+    T extends undefined ? "undefined" :
+    T extends Function ? "function" :
+    "object"
+
+type T1 = TypeName<string>
+
+type T00 = Exclude<"a" | "b" | "c" | "d", "a" | "c" | "f">;  // "b" | "d"
+
+// 预定义的有条件类型：
+/** @
+ * Exclude<T, U> -- 从T中剔除可以赋值给U的类型。
+ * Extract<T, U> -- 提取T中可以赋值给U的类型。
+ * NonNullable<T> -- 从T中剔除null和undefined。
+ * ReturnType<T> -- 获取函数返回值类型。
+ * InstanceType<T> -- 获取构造函数类型的实例类型。
+ * 
+ */
 

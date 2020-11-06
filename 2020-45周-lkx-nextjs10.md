@@ -115,7 +115,9 @@ npm install next@latest react@latest react-dom@latest
 ## getStaticProps/getServerSideProps快速刷新
 
 当对您的getStaticProps和getServerSideProps函数进行编辑时，Next.js现在将自动重新运行该函数并应用新数据。这使您可以更快地进行迭代而不必刷新页面。
-![avatar](/img/nextjs.png)
+* getStaticProps（静态生成）：在构建时获取数据。
+* getStaticPaths（静态生成）：指定动态路由以根据数据进行预渲染。
+* getServerSideProps（服务器端渲染）：在每个请求上获取数据。
 
 ## 自动解决 href
 以前的动态路由 必须同时提供href和as属性
@@ -130,7 +132,24 @@ npm install next@latest react@latest react-dom@latest
 当Next.js中的某个功能被弃用并需要更改较大的代码库时，我们的团队将为其创建一个codemod。codemod是一种自动化的代码转换，您可以在项目上运行以更新源代码。
 
 例如：我们发布了一个codemod，用于将箭头功能和匿名功能更新为命名功能。需要进行[此转换](https://nextjs.org/docs/advanced-features/codemods#name-default-component)。
-![avatar](/img/codemods.jpeg)
+例子：name-default-component —— 将匿名组件转换为命名组件
+```js
+// my-component.js
+export default function () {
+  return <div>Hello World</div>
+}
+```
+转换为：
+```js
+// my-component.js
+export default function MyComponent() {
+  return <div>Hello World</div>
+}
+```
+用法：
+```js
+npx @next/codemod name-default-component
+```
 
 借助Next.js 10，我们将发布一个新的Next.js codemods CLI工具，该工具可让您运行一个命令来更新应用程序：
 ```js

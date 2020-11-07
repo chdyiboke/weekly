@@ -365,5 +365,5 @@ updateFromMap 和 updateSlot 的逻辑差不多，唯一不同的就是，对于
 ## 总结
 reconcileChildrenArray 比较数组的方法很简单，首先逐个对比(相同位置对比)两个数组，如果相等则继续，如果有任何一个不等，那么跳出循环。如果老的数组全部被复用，那么补齐新数组，如果新数组已经完成，那么删除老数组中多余的部分。如果新数组没有完全生成，老数组也没有完全复用，那么创建一个 map，用于存放未被复用的老数组，然后遍历剩余的新数组，检查是否能从老数组中得到可复用的部分，有则复用，没有则新建。最后老的没有匹配到的都要删除。  
 例子：  
-![avatar](/img/diff-arr.png)  
+![avatar](https://picb.zhimg.com/80/v2-306c0da3e9af0148830b9aa4b64abc5b_1440w.jpg)  
 我在例子中使用了相同的方格来示新旧的数组，其实它们是完全不一样的，老的 children 是 Fiber 对象组成的链，新的childern 是React Element组成的 array。reconcileChildrenArray 目的就是复用老的 children 的 Fiber 链。但是，新的 Fiber 链不是直接复用老的 Fiber 链，而是复用了 fiber.alternate。这种双缓存策略使得 fiber 对象可以一直被交替使用。

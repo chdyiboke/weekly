@@ -1,4 +1,4 @@
-# reconcileChildFibers之对象
+# reconcileChildFibers之对象、文本
 
 ## reconcileChildren
 作用：进入diff算法

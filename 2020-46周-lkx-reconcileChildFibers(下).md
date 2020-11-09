@@ -253,7 +253,6 @@ function updateSlot(
       }
     }
     // 如果是数组，则作为fragment来处理
-    // 这也就解释了问什么 reconcileChildFibers 中最开始要处理 Fragment
     if (isArray(newChild) || getIteratorFn(newChild)) {
       if (key !== null) {
         return null;
@@ -289,7 +288,7 @@ function placeChild(
   newIndex: number,
 ): number {
   newFiber.index = newIndex;  // index 置为 newIndex
-  if (!shouldTrackSideEffects) {  //  如果不是初次渲染的话（shouldTrackSideEffects 为 true），无需更新
+  if (!shouldTrackSideEffects) { 
     // Noop.
     return lastPlacedIndex;
   }

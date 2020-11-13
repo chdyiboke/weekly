@@ -61,8 +61,11 @@ function reconcileChildrenArray(
       }
  
       // 到这里表示 oldFiber 和 newFiber 有相同的 key,是可以复用的
- 
+  
+      // 节点初次渲染情况下
       if (shouldTrackSideEffects) {
+        //newFiber.alternate表示并没有复用 oldFiber 来赋值,而是 return 了新的 fiber
+        //所以要删除存在的 旧的fiber
         //oldFiber节点存在，但是newFiber是新创建的，说明oldFiber没有被复用
         if (oldFiber && newFiber.alternate === null) {
           // 将oldFiber添加到returnFiber的EffectList中

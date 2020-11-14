@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<canvas id="canvas1" style="border:1px solid black;">
+</canvas>
+<script>
+    var oC = document.getElementById('canvas1');
+    // oC.width = 500;
+    // oC.width = 500;
+    oC.style.width = "500px";
+    oC.style.height = "500px";
+    var ctx = oC.getContext("2d");
+    ctx.moveTo(0, 0);
+    ctx.lineTo(200, 200);
+    ctx.stroke();
+</script>
+<!-- 设置style属性，都会拉伸(修改画板宽高)
+情况一：
+
+canvas｛
+    width: 500px;
+    height: 500px;
+ ｝
+或者 行间样式中的 style=””
+情况二：
+
+canvas.style.width = "500px";
+canvas.style.height = "500px";
+相当于把画板的宽和高改变了，画布的宽和高还是默认值，所以画布会出现拉伸的情况。
+
+直接设置宽和高相当于是同时修改了画板和画布的宽和高，所以在画布上画的图形不会出现拉伸：
+情况一：
+
+<canvas width="500" height="500"></canvas>
+或者 行间样式中的 style=””
+情况二：
+
+canvas.width = 500;
+canvas.width = 500; -->
+</body>
+</html>

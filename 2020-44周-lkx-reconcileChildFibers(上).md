@@ -106,7 +106,7 @@ function reconcileChildFibers(   // diff算法实现
 
 ### 对象(reconcileSingleElement)
 流程：
-![avatar](/img/diffObj.png)
+![avatar](img/diffObj.png)
 ```js
 function reconcileSingleElement(
     returnFiber: Fiber,

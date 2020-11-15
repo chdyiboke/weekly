@@ -20,6 +20,7 @@
 * Accept-Language，
 * Content-Language，
 * Content-Type 的值为 application/* * x-www-form-urlencoded，multipart/form-data 或 text/plain。  
+
 任何其他请求都被认为是“非简单请求”。例如，具有 PUT 方法或 API-Key HTTP-header 的请求就不是简单请求。
 
 本质区别在于，可以使用 form 或 script 进行“简单请求”，而无需任何其他特殊方法。
@@ -53,7 +54,7 @@ Origin 包含了确切的源（domain/protocol/port），没有路径。
 
 它确保发送的跨源请求带有正确的 Origin。
 它检查响应中的许可 Access-Control-Allow-Origin，如果存在，则允许 JavaScript 访问响应，否则将失败并报错。
-![avatar](/img/request-easy.png) 
+![avatar](img/request-easy.png) 
 
 这是一个带有服务器许可的响应示例：
 ```
@@ -108,7 +109,7 @@ Access-Control-Expose-Headers: Content-Length,API-Key
 * Access-Control-Allow-Headers 必须具有一个允许的 header 列表。
 * 另外，header Access-Control-Max-Age 可以指定缓存此权限的秒数。因此，浏览器不是必须为满足给定权限的后续请求发送预检。
 
-![avatar](/img/request-noeasy.png) 
+![avatar](img/request-noeasy.png) 
 举个栗子：
 ```js
 let response = await fetch('https://site.com/service.json', {

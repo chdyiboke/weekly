@@ -515,4 +515,4 @@ function workLoop(hasTimeRemaining, initialTime) {
 
 ## 具体流程
 
-![avatar](/img/scheduleWork.png)
+![avatar](img/scheduleWork.png)

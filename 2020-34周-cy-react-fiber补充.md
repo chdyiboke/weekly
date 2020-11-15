@@ -123,11 +123,11 @@ function workLoop(isYieldy) {
 
 例如，我们的更新引起c2被插入到DOM，d2并c1更改其属性，并b2解雇生命周期方法。效果列表会将它们链接在一起，以便React以后可以跳过其他节点：  
 
-![React effect](/img/ract-fiber.png)
+![React effect](img/ract-fiber.png)
 
 effects list，上图可以表示为线性列表，如下所示：
 
-![React effect list](/img/fiber-effect-list.png)
+![React effect list](img/fiber-effect-list.png)
 
 
 

@@ -202,7 +202,7 @@ if (!Function.prototype.bind) {
 ```
 
 
-![维护原型关系](/img/bindthis.png)
+![维护原型关系](img/bindthis.png)
 
 
 ## 参考

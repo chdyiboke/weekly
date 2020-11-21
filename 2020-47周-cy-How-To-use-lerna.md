@@ -87,7 +87,8 @@ lerna clean #清除所有包的 node_modules 目录
 ## 参考
 
 [lerna中文文档详解](https://segmentfault.com/a/1190000019350611)  
-[lerna管理package](https://juejin.im/post/6844903885312622606)
+[lerna管理package](https://juejin.im/post/6844903885312622606)  
+[为啥使用lerna](https://zhuanlan.zhihu.com/p/33858131)
 
 
 

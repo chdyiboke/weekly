@@ -131,7 +131,7 @@ function completeUnitOfWork(unitOfWork: Fiber): Fiber | null {
 
 Effect 链最终会归在 root 节点上，root 节点上就记录了这个 fiber 树上所有需要更新的地方，然后根据 Effect 链进行更新，这是比较高效的。
 
-⑦ else的情况就是执行更新的过程中捕获到error的情况，此时执行的是unwindWork而不是completeWork，与completeWork最大的区别是有ShouldCapture的判断，也是后续文章会讲到
+⑦ else的情况就是执行更新的过程中捕获到error的情况
 
 else后面的逻辑跟上面大同小异了，不再赘述
 
@@ -182,8 +182,7 @@ function stopProfilerTimerIfRunningAndRecordDelta(
 }
 ```
 # resetChildExpirationTime
-resetChildExpirationTime 这个方法就是找到当前节点的所有子节点，并且读取他的更新时间和他的子节点更新时间，找到其中非NoWork的最早过期时间，然后赋值给当前节点的
-# childExpirationTime
+resetChildExpirationTime 这个方法就是找到当前节点的所有子节点，并且读取他的更新时间和他的子节点更新时间，找到其中非NoWork的最早过期时间，然后赋值给当前节点的childExpirationTime
 ```js
 function resetChildExpirationTime(completedWork: Fiber) {  //更新该节点的 work 时长和获取优先级最高的子节点的 expirationTime
   if (

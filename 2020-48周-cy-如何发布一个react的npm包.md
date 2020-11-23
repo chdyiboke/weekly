@@ -3,9 +3,10 @@
 ## 制作
 
 ### package.json
-// package.json
-    
+
+
 ```
+// package.json
 "main": "dist/bundle.js",
 "files": ["dist"],
 "scripts": {
@@ -21,11 +22,11 @@ npm i react react-dom
 npm i -D  babel-loader @babel/core @babel/preset-env @babel/preset-react webpack webpack-dev-server webpack-cli html-webpack-plugin webpack-node-externals css-loader style-loader 
 ```
 
-依赖版本的升级很快，所以如果读者发现依赖有问题，请参考官方文档正确安装。
+依赖版本的升级很快，所以如果发现依赖有问题，请参考官方文档正确安装。
 
 ### 配置 webpack
 
-webpack 开发配置
+开发配置
 ```
 const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');

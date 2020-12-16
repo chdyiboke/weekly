@@ -17,6 +17,9 @@ const personProxy = new Proxy(person, {
 })
 ```
 
+
+
+
 ## Object.defineProperty
 
 
@@ -27,3 +30,6 @@ Proxy是专门为对象设置访问代理器的，通过Proxy可以轻松监视�
 
 
 
+## 参考
+
+[Proxy 的巧用](https://juejin.cn/post/6844904012790120462#heading-11)

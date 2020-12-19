@@ -1,7 +1,7 @@
 .DS_Store
 .vscode
 
-bin/.last_run_module
+bin/
 node_modules/
 
 public

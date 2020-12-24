@@ -179,3 +179,7 @@ stopImmediatePropagation常常在多个第三方库混用时，用来阻止多�
 
 ## 源码解析
 https://juejin.cn/post/6844903988794671117#heading-5
+
+
+## 参考
+https://juejin.cn/post/6909271104440205326

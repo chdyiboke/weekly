@@ -460,4 +460,22 @@ for (let i of obj) {
 }
 ```
 
-关于 Iterator 就写到这里了，下一篇写 ES6 的 Generator 生成器。
+添加这个，下面的代码就可以for...of 遍历
+
+```javascript
+Object.prototype[Symbol.iterator] = function*(){
+    var keys = Object.keys(obj);
+    for(var k of keys){
+        yield [k,obj[k]]
+    }
+};
+// https://www.cnblogs.com/blogs-xlf/p/11274884.html
+```
+
+### 为什么object不可迭代？
+
+对象的哪个属性先遍历，哪个属性后遍历是不确定的，需要开发者手动指定。（情况有很多种）
+部署了遍历器接口的对象其实就是ES6里的Map结构，如果你需要的话，直接使用Map就好了
+
+
+

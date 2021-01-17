@@ -101,7 +101,7 @@ render
 
 找到触发更新节点对应的 fiberRoot 节点，然后调对该节点的更新，分为两种情况：同步和异步，同步又可以分为两种：是否是 LegacyUnbatchedContext，如果是就不需要调度直接进入下一阶段（render phase），如果不是就放到下一帧立即执行，对于异步任务则需要根据优先级算出一个过期时间，然后再和队列里排队的任务进行比较找出马上要过期的那个任务在下一帧进入下一个阶段执行（render phase）。
 
-流程图：
+流程图：    
 ![avatar](img/setState/schedule-all.png)
 
 说明：
@@ -130,7 +130,7 @@ render
 
 
 #### ensureRootIsScheduled
-流程图：
+流程图：  
 
 ![avatar](img/setState/ensureRootIsScheduled.png)
 说明： 
@@ -147,7 +147,7 @@ render
 将传入的 reactPriorityLevel 转换为 schedule 中的 priorityLevel 然后调用 Scheduler_scheduleCallback
 
 #### unstable_scheduleCallback
-流程图：
+流程图：  
 ![avatar](img/setState/unstable_scheduleCallback.png)
 
 ```js
@@ -204,7 +204,7 @@ function workLoop(hasTimeRemaining, initialTime) {
 #### 概述
 从 rootFiber 开始循环遍历 fiber 树的各个节点，对于每个节点会根据节点类型调用不同的更新方法，比如对于 class 组件会创建实例对象，调用 updateQueue 计算出新的 state，执行生命周期函数等，再比如对于 HostComponent 会给它的 children 创建 fiber 对象，当一侧子树遍历完成之后会开始执行完成操作，即创建对应 dom 节点并添加到父节点下以及设置父节点的 effect 链，然后遍历兄弟节点对兄弟节点也执行上述的更新操作，就这样将整棵树更新完成之后就可以进入下一阶段（commit phase）。
 
-#### 整体流程图：
+#### 整体流程图
 ![avatar](img/setState/performSyncWorkOnRoot.png)
 
 ### commit

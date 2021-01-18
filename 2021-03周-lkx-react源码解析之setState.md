@@ -95,6 +95,20 @@ render
 1. 计算 lane
 2. 创建 update 并将更新放入队列中
 
+```js
+function initializeUpdateQueue(fiber) {
+  const queue = {
+    baseState: fiber.memoizedState,
+    firstBaseUpdate: null,
+    lastBaseUpdate: null,
+    shared: {
+      pending: null,
+    },
+    effects: null,
+  };
+  fiber.updateQueue = queue;
+}
+```
 ### schedule
 
 #### 概述
@@ -227,12 +241,42 @@ function workLoop(hasTimeRemaining, initialTime) {
 3. HostComponent：判断如果有 autoFocus 则调用 focus 方法来获取焦点
 其它类型暂且不表
 
+## forceUpdate
+
+setState执行enqueueSetState方法，forceUpdate执行enqueueForceUpdate方法
+
+强制让组件重新渲染，也是给React节点的fiber对象创建update，并将该更新对象入队
+
+与enqueueSetState()方法的流程类似，唯一不同的是多了个手动修改属性tag的值：
+```js
+//与setState不同的地方
+//默认是0更新，需要改成2强制更新
+update.tag = ForceUpdate;
+```
+可以看到createUpdate()方法中，初始化的tag值是UpdateState：
+```js
+function createUpdate(eventTime, lane, suspenseConfig) {
+  const update = {
+    eventTime, 
+    lane, 
+    suspenseConfig, // null
+    tag: UpdateState, // 0  0更新 1替换 2强制更新 3捕获性的更新
+    payload: null,
+    callback: null,
+    next: null,
+  };
+  return update;
+}
+```
+
+因此要改成ForceUpdate，以便React进行Update优先级排序
 ## 总结
 
 针对开始提出的三个问题，做一个总结
+
 1. 为什么有时连续多次 setState只有一次生效？
 
-批量更新, 减少state的频繁更新，从而避免重复的View刷新, render()的调用。
+setState 的批量更新优化也是建立在“异步”（合成事件、钩子函数）之上的，在原生事件和setTimeout 中不会批量更新，在“异步”中如果对同一个值进行多次 setState ， setState 的批量更新策略会对其进行覆盖，取最后一次的执行，如果是同时 setState 多个不同的值，在更新时会对其进行合并批量更新。
 
 
 2. 执行完setState获取state的值能获取到吗？
@@ -243,7 +287,28 @@ setTimeout或原生事件是同步的，所以可以获取到修改后的值。
 3. setState是同步的还是异步的？
 
 setState 只在合成事件和钩子函数中是“异步”的，在原生事件和 setTimeout 中都是同步的。
-setTimeout或原生事件没有走React的合成事件机制，React的合成事件机制是异步的, 但是setState本身是个同步的。
+
+setState的“异步”并不是说内部由异步代码实现，其实本身执行的过程和代码都是同步的，只是合成事件和钩子函数的调用顺序在更新之前，导致在合成事件和钩子函数中没法立马拿到更新后的值，形式了所谓的“异步”，当然可以通过第二个参数 setState(partialState, callback) 拿到更新后的结果。
+
+![avatar](img/setState/sync.png)
+
+下面是针对合成事件、setTimeout/元素事件、钩子函数不同情况的流程图：
+![avatar](img/setState/onclick.png)
+
+![avatar](img/setState/setTimeout:addEventListener.png)
+
+![avatar](img/setState/钩子函数.png)
+
+## 参考
+https://juejin.cn/post/6898635086657224717
+
+https://juejin.cn/post/6844904176892248072
+
+https://juejin.cn/post/6914089940649246734
+
+https://juejin.cn/post/6844904050509660167
+
+
 
 
 

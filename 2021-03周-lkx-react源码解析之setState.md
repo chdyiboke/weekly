@@ -234,12 +234,11 @@ function workLoop(hasTimeRemaining, initialTime) {
 ![avatar](img/setState/commitRoot.png)
 
 #### commitLayoutEffects
-该方法是整个 commit 阶段最后一个循环执行的方法，内部主要调用两个方法 commitLayoutEffectOnFiber 和 commitAttachRef，第一个方法内部是一个 switch 对于不同的节点进行不同的操作：
+该方法是整个 commit 阶段最后一个循环执行的方法，内部主要调用方法 commitLayoutEffectOnFiber，内部是一个 switch 对于不同的节点进行不同的操作，和seState的callback相关的则是ClassComponent
 
-1. ClassComponent：执行 componentDidMount 或 componentDidUpdate，最后调用 commitUpdateQueue 处理 update，这里不同于 processUpdateQueue，这里主要处理 update 上面的 callback，比如 setState 方法的第二个参数或是生成异常 update 对应的 callback（componentDidCatch）
-2. HostRoot：也会调用 commitUpdateQueue，因为 ReactDOM.render 方法的第三个参数也可以接受一个 callback
-3. HostComponent：判断如果有 autoFocus 则调用 focus 方法来获取焦点
-其它类型暂且不表
+执行 componentDidMount 或 componentDidUpdate，最后调用 commitUpdateQueue 处理 update，这里主要处理 update 上面的 callback，比如 setState 方法的第二个参数或是生成异常 update 对应的 callback（componentDidCatch）
+
+所以说，callback是在commitRoot后完成的，即重新渲染后，执行完setState获取state的值获取的是修改之前的值，只有重新渲染后获取的值才是最新的值
 
 ## forceUpdate
 

@@ -90,7 +90,7 @@ render
 
 在说对象初始化之前先看下fiberNode的创建和fiberNode的结构
 
-<img src="img/setState/fiber.png" align=center />
+<img src="img/setState/fiber.png" height="300" align=center />
 
 ```js
 function FiberNode(
@@ -141,7 +141,7 @@ function FiberNode(
 ```
 
 流程图：  
-<img src="img/setState/render.png" align=center />
+<img src="img/setState/render.png" height="300" align=center />
 ### initializeUpdateQueue
 
 <img src="img/setState/initializeUpdateQueue.png" align=center />
@@ -150,7 +150,7 @@ function FiberNode(
 真正的渲染入口
 performUnitOfWork 是 workLoopSync 和 workLoop 两个方法都会调用的方法，在其内部会调用 beginWork 方法，beginWork 方法会返回下一个要执行的任务（next），如果 next 为空表示已经遍历到叶子节点了，则调用 completeUnitOfWork 可以执行完成逻辑了
 ### updateClassComponent
-<img src="img/setState/updateClassComponent.png" align=center />
+<img src="img/setState/updateClassComponent.png" height="300" align=center />
 
 memoizedState为null
 在进行workloop进行循环->
@@ -218,7 +218,7 @@ const classComponentUpdater = {
 };
 ```
 ### mountClassInstance
-<img src="img/setState/mountClassInstance.png" height = "500" align=center />
+<img src="img/setState/mountClassInstance.png" height="500" align=center />
 
 ### updateClassInstance
 复用ClassComponent实例，更新props和state，调用生命周期API—componentWillMount()和componentDidMount() 和getSnapshotBeforeUpdate()，最终返回shouldUpdate:boolean
@@ -236,13 +236,13 @@ resetHasForceUpdateBeforeProcessing() 重置hasForceUpdate值为false
 
 ### resumeMountClassInstance
 该方法与updateClassInstance()逻辑类似，就不再赘述了，但注意下两者调用生命周期 API 的不同：
-<img src="img/setState/updateClassInstance.png" height = "500" align=center />
+<img src="img/setState/updateClassInstance.png" height = "200" align=center />
 
 ### processUpdateQueue
-<img src="img/setState/processUpdateQueue.png" align=center />
+<img src="img/setState/processUpdateQueue.png" height = "400" align=center />
 
 ### getStateFromUpdate
-<img src="img/setState/getStateFromUpdate.png" align=center />
+<img src="img/setState/getStateFromUpdate.png" height = "400" align=center />
 
 ### finishClassComponent
 判断是否执行render()，并返回render下的第一个child
@@ -293,7 +293,7 @@ ReactNoopUpdateQueue 主要起到一个在非生产版本中警告(warning)的�
 
 需要注意的是如果是通过 react element 上绑定的事件函数里面调用的 setState 方法，会在执行 setState 方法之前设置 executionContext |= EventContext;，所以在 scheduleUpdateOnFiber 方法中会进入下图的分支。
 
-<img src="img/setState/scheduleUpdateOnFiber.png" align=center />
+<img src="img/setState/scheduleUpdateOnFiber.png" height = "300" align=center />
 
 并且在 setState 执行完之后才会调用 flushSyncCallbackQueue 执行更新，此时采用调用 performSyncWorkOnRoot
 
@@ -324,7 +324,7 @@ ReactNoopUpdateQueue 主要起到一个在非生产版本中警告(warning)的�
 #### unstable_scheduleCallback
 流程图：  
 
-<img src="img/setState/unstable_scheduleCallback.png" height = "500" align=center />
+<img src="img/setState/unstable_scheduleCallback.png" height = "400" align=center />
 
 ```js
   var expirationTime = startTime + timeout;  // 过期时间 = startTime + timeout
@@ -370,7 +370,7 @@ function workLoop(hasTimeRemaining, initialTime) {
 对于 scheduleSyncCallback 来说最终执行的scheduledHostCallback 就是 flushSyncCallbackQueueImpl
 这个方法中就是循环执行 syncQueue 数组中的任务
 
-<img src="img/setState/flushSyncCallbackQueueImpl.png" height = "500" align=center />
+<img src="img/setState/flushSyncCallbackQueueImpl.png" height = "400" align=center />
 
 #### flushSyncCallbackQueue
 还记得最开始如果处于同步阶段并且 executionContext 为 NoContext 时调用flushSyncCallbackQueue 就会调用这个方法，这个方法首先去调用 Scheduler_cancelCallback 取消 immediateQueueCallbackNode，接着会执行 flushSyncCallbackQueueImpl 也就是上面那个方法，immediateQueueCallbackNode 的 callback 对应的就是 flushSyncCallbackQueueImpl，所以这个方法就是立即调用 flushSyncCallbackQueueImpl 去执行 syncQueue 中的回调任务而不是等待下一帧执行。
@@ -460,13 +460,13 @@ commit阶段
 下面是针对合成事件、setTimeout/原生事件、钩子函数不同情况的流程图：
 
 1. 合成事件  
-<img src="img/setState/onclick.png" height = "500" align=center />
+<img src="img/setState/onclick.png" height = "400" align=center />
 
 2. setTimeout/原生事件  
-<img src="img/setState/setTimeout:addEventListener.png" height = "500" align=center />  
+<img src="img/setState/setTimeout:addEventListener.png" height = "400" align=center />  
 
 3. 钩子函数  
-<img src="img/setState/钩子函数.png" height = "500" align=center />
+<img src="img/setState/钩子函数.png" height = "400" align=center />
 
 
 

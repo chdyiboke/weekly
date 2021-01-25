@@ -133,12 +133,11 @@ function commitRootImpl() {
     // 让调度器在 帧 的末尾暂停，给浏览器机会执行一次 重绘
     requestPaint();
      
-    // rootDoesHavePassiveEffects 标志位判断，该标志位是在 commit 第一阶段进行设置，标记当前 commit 是否具有 passiveEffect
+    // 本次 commit 是否有产生新的更新
     if (rootDoesHavePassiveEffects) {
-      rootDoesHavePassiveEffects = false;
-        rootWithPendingPassiveEffects = root;
-        pendingPassiveEffectsExpirationTime = expirationTime;
-        pendingPassiveEffectsRenderPriority = renderPriorityLevel;
+    // 如果存在新的更新，将 root 节点赋给 rootWithPendingPassiveEffects
+    rootWithPendingPassiveEffects = root;
+    ...
     } else {
       // 遍历 effect list 逐个设置为 null 以便 GC
       nextEffect = firstEffect;
@@ -181,7 +180,7 @@ function commitRootImpl() {
 未来：从概念上来说它表现为：所有 effect 函数中引用的值都应该出现在依赖项数组中。未来编译器会更加智能，届时自动创建数组将成为可能。
 
 ### 1. Hook 在组件顶层调用
-[在组件顶层调用 Hook 的原因](https://react.html.cn/docs/hooks-rules.html#explanation)
+[在组件顶层调用 Hook 的原因](https://react.html.cn/docs/hooks-rules.html#explanation)  
 我们可以在单个组件中使用多个 State 或 Effect Hook：  
 那么 React 如何知道哪个 state(状态) 对应于哪个 useState 调用呢？答案是 React 依赖于调用 Hooks 的顺序。  
 
@@ -233,3 +232,6 @@ lanes：可以同时执行多个任务的能力。 // 值越大，优先级越�
 react 作者 acdlite 觉得操作状态队列不够方便，进而采用了一种“位运算代替状态队列”的方式：{ lanes: 0b10010 }
 新的 lane 算法中，lanes 是一个二进制数字，比如 10010 是由 10000 和 00010 两个任务叠加而成的。
 
+### 8. 钩子里面初始化定时器问题。
+期待后面钩子的分享：
+如何解决 https://overreacted.io/zh-hans/making-setinterval-declarative-with-react-hooks/

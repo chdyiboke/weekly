@@ -100,3 +100,6 @@ export { useTimeout, useInterval };
 ```
 
 ## 感想
+
+ useRef 每次都会返回相同的引用，不会因为刷新而被初始化，可以保存上一个状态。
+ https://juejin.cn/post/6844904062681350157

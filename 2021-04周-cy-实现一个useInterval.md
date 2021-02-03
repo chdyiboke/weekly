@@ -43,18 +43,21 @@ useEffect(() => {
 
 方法三：
 
-封装 useTimeout
+封装 useInterval (下面也包含 useTimeout)
 
 用法：
 ```
 export default () => {
   const [state, setState] = useState(1);
-  useTimeout(() => {
-    setState(state + 1);
-  }, 3000);
+
   useInterval(() => {
     setState(state + 1);
   }, 3000);
+
+  useTimeout(() => {
+    setState(state + 1);
+  }, 3000);
+
   return (
     <div>
       <p style={{ marginTop: 16 }}> {state} </p>
@@ -66,21 +69,6 @@ export default () => {
 封装
 ```
 import { useRef, useEffect } from 'react';
- 
-function useTimeout(fn, delay) {
-  // const fnRef = usePersistFn(fn);
-  const fnRef = useRef();
-  fnRef.current = fn;
-  useEffect(() => {
-    if (delay === undefined || delay === null) return;
-    const timer = setTimeout(() => {
-      fnRef.current();
-    }, delay);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [fnRef, delay]);
-}
  
 function useInterval(fn, delay) {
   const fnRef = useRef(null);
@@ -96,10 +84,26 @@ function useInterval(fn, delay) {
   }, [delay]);
 }
  
+function useTimeout(fn, delay) {
+  // const fnRef = usePersistFn(fn);
+  const fnRef = useRef();
+  fnRef.current = fn;
+  useEffect(() => {
+    if (delay === undefined || delay === null) return;
+    const timer = setTimeout(() => {
+      fnRef.current();
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [fnRef, delay]);
+}
+
 export { useTimeout, useInterval };
 ```
 
 ## 感想
 
  useRef 每次都会返回相同的引用，不会因为刷新而被初始化，可以保存上一个状态。
+
  https://juejin.cn/post/6844904062681350157

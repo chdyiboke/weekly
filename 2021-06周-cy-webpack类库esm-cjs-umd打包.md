@@ -36,15 +36,15 @@ libraryTarget: "umd" - 这个选项会尝试把库暴露给前使用的模块定
 ## 目标
 组件打包 esm/cjs/umd 3种主流方式。
 
-## ems
+### ems
 es怎么实现？
 思考题哈哈哈。
 
 
-## cjs
+### cjs
 libraryTarget: "commonjs"
 
-## umd
+### umd
 libraryTarget: "umd"
 
 ## 参考

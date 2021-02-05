@@ -23,7 +23,23 @@ export default Demo();
 根据闭包的特性，state模块中的state变量，会持久存在。因此当Demo函数再次执行时，我们也能获取到上一次Demo函数执行结束时state的值。
 
 这就是React Hooks能够让函数组件拥有内部状态的基本原理。
+```
+// state.js
+let state = null;
 
+export const useState = (value: number) => {
+  // 第一次调用时没有初始值，因此使用传入的初始值赋值
+  state = state || value;
+
+  function dispatch(newValue) {
+    state = newValue;
+    // 假设此方法能触发页面渲染
+    render();
+  }
+
+  return [state, dispatch];
+}
+```
 
 ## useInterval 中的 useRef
 

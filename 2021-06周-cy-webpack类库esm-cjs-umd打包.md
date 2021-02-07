@@ -40,6 +40,12 @@ libraryTarget: "umd" - 这个选项会尝试把库暴露给前使用的模块定
 es怎么实现？
 思考题哈哈哈。
 
+直接用 babel 编译一下就好。
+```
+babel src -d es
+```
+因为我们写的本来就是 es 代码。
+
 
 ### cjs
 libraryTarget: "commonjs"
@@ -47,6 +53,9 @@ libraryTarget: "commonjs"
 ### umd
 libraryTarget: "umd"
 
+## dev开发
+
+使用 热更新 + `html-webpack-plugin` 添加html即可。
 ## 参考
-[demo: c-package](https://github.com/chdyiboke/c-package)
+[demo: c-package 源代码](https://github.com/chdyiboke/c-package)  
 [详解webpack的out.libraryTarget属性](https://blog.csdn.net/frank_yll/article/details/78992778)

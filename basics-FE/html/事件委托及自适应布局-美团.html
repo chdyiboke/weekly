@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>美团</title>
+    <style>
+        .parent {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .child {
+          flex: 0 0 16%;
+          background-color: lightgreen;
+        }
+      @media screen and (max-width: 1000px){
+        .child {
+          flex: 0 0 33%;
+          background-color: lightblue;
+        }
+      }
+    </style>
+</head>
+<body>
+<div>list-自适应及事件委托</div>
+<div class="parent">
+  <div class="child">1</div> 
+  <div class="child">2</div>
+  <div class="child">3</div>
+  <div class="child">4</div>
+  <div class="child">5</div>
+  <div class="child">6</div>
+<div>
+
+<script>
+  // https://www.cnblogs.com/yangsg/p/10606553.html
+   var parent = document.querySelector(".parent");
+   parent.onclick = function (e) {
+　　e = e || window.event; //这一行及下一行是为兼容IE8及以下版本
+　　var target = e.target || e.srcElement;
+　　if (target.className.toLowerCase() === "child") {
+　　　　var li = this.querySelectorAll(".child");
+　　　　index = Array.prototype.indexOf.call(li, target);
+　　　　alert(target.innerHTML + index);
+    　　}
+    }
+</script>
+</body>
+</html>

@@ -39,7 +39,8 @@
 　　var target = e.target || e.srcElement;
 　　if (target.className.toLowerCase() === "child") {
 　　　　var li = this.querySelectorAll(".child");
-　　　　index = Array.prototype.indexOf.call(li, target);
+// 　　　　index = Array.prototype.indexOf.call(li, target);
+      index = Array.from(li).indexOf(target);
 　　　　alert(target.innerHTML + index);
     　　}
     }

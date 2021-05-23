@@ -1,6 +1,9 @@
 # weekly
 issue and share weekly
 
+## 更换地址
+
+家里访问 github 有些问题，还gitee了，[地址](https://gitee.com/chdyi/weekly)
 ## 讨论 issue
 
 写到 issue 里面，一直open就好，各抒己见。  

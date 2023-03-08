@@ -4,7 +4,7 @@ $('.app').css('color', 'red')
 
 // 3种类库的声明文件写法。 栗子： @types/koa
 
-// 1. global-lib.js
+// 1. 全局 global-lib.js
 
 globalLib({x: 1})
 globalLib.doSomething()
@@ -36,7 +36,7 @@ declare namespace moduleLib {
     function doSomething(): void
 }
 
-export = moduleLib
+export = moduleLib // 兼容性最好
 
 // 3. umd 类库 
 

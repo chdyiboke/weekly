@@ -1,7 +1,7 @@
 # md 语法收集
 
-
 ## 文字颜色、字体、大小
+
 ps：黑体字又称方体或等线体，是一种字面呈正方形的粗壮字体
 
 ```
@@ -9,10 +9,10 @@ DOM标准<font color="#dd0000" face="黑体" size="20">浅红色文字：</font>
 
 ```
 
-DOM标准<font color="#dd0000" face="黑体" size="20">浅红色文字：</font>DOM标准
-
+DOM 标准<font color="#dd0000" face="黑体" size="20">浅红色：</font>DOM 标准
 
 ## 表格
+
 ```
 
 | 左对齐 | 右对齐 | 居中对齐 |

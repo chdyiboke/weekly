@@ -1,0 +1,45 @@
+{
+  "name": "c-package",
+  "version": "1.0.7",
+  "description": "A react component package can build esm/cjs/umd",
+  "author": "caiyi04",
+  "license": "MIT",
+  "keywords": ["es", "webpack", "build"],
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "start": "webpack serve",
+    "build": "npm run build-all",
+    "build-all": "npm run es && npm run commonjs && npm run umd",
+    "es": "babel src -d es",
+    "commonjs": "webpack --config webpack-config-commonjs.js",
+    "umd": "webpack --config webpack-config-umd.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "css-loader": "^5.0.1",
+    "html-webpack-plugin": "^4.5.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.20.0",
+    "webpack-cli": "^4.5.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.4",
+    "@babel/runtime": "^7.5.5",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.6",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "homepage": "https://github.com/chdyiboke/c-package",
+  "repository": "https://github.com/chdyiboke/c-package"
+}

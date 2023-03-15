@@ -1,0 +1,14 @@
+/coverage
+/demo/dist
+/es
+/bin/
+/lib
+/node_modules
+/umd
+/.eslintcache
+npm-debug.log*
+.DS_Store
+.idea
+.vscode
+tmp
+logs

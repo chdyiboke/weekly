@@ -29,27 +29,6 @@ stack: it.stack || "",
 // item.stack = "total";
 ```
 
-## X 轴文字按规则，截断
-
-```js
-/**
- * params: 123***4567
- */
-const params = '123***4567';
-(opt.xAxis as any).axisLabel.formatter = () => {
-  const n = 4
-  let news = params;
-  if (params.match(/***/)) {
-    news =
-      params.substring(0, params.match(/***/).index - n) +
-      "\n" +
-      params.substring(params.match(/***/).index - n, params.length);
-  }
-  return news;
-};
-
-```
-
 ## 排序
 
 ## dataZoom
